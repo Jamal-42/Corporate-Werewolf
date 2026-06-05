@@ -1,0 +1,15 @@
+{
+  "version": "test_bat",
+  "generated_at": "2026-06-05T08:45:20",
+  "source_report": "reports/evaluation_report_20260605_084034_806983.json",
+  "mode": "template",
+  "roles": [
+    "普通员工",
+    "CEO",
+    "HR总监",
+    "间谍",
+    "法务总监",
+    "安保主管"
+  ],
+  "granularity": "role_x_stage_x_event_type"
+}

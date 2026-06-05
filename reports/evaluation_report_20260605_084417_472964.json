@@ -1,0 +1,3307 @@
+{
+  "generated_at": "2026-06-05T08:44:17",
+  "agent_version": "baseline",
+  "summary": {
+    "overall_score": 47.86,
+    "decision_count": 102,
+    "player_count": 12,
+    "high_severity_mistakes": 0,
+    "medium_severity_mistakes": 20,
+    "coverage": {
+      "skill": 26,
+      "speech": 4,
+      "vote": 72
+    }
+  },
+  "dimension_scores": {
+    "skill": 48.1,
+    "speech": 70,
+    "vote": 46.54
+  },
+  "roles": {
+    "1号": "狼人",
+    "2号": "狼人",
+    "3号": "狼人",
+    "4号": "狼人",
+    "5号": "预言家",
+    "6号": "女巫",
+    "7号": "猎人",
+    "8号": "守护者",
+    "9号": "村民",
+    "10号": "村民",
+    "11号": "村民",
+    "12号": "村民"
+  },
+  "seat_characters": {
+    "老油条": "狼人",
+    "逻辑怪": "狼人",
+    "小透明": "狼人",
+    "卷王": "狼人",
+    "PUA总裁": "预言家",
+    "表格人": "女巫",
+    "嘴炮王": "猎人",
+    "知心姐": "守护者",
+    "沉默侠": "村民",
+    "暴躁哥": "村民",
+    "铁头哥": "村民",
+    "Lisa": "村民"
+  },
+  "leaderboard": [
+    {
+      "player": "12号",
+      "role": "村民",
+      "agent_version": "baseline",
+      "overall_score": 61.94,
+      "speech_score": 0,
+      "vote_score": 61.94,
+      "skill_score": 0,
+      "decision_count": 8,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "6号",
+      "role": "女巫",
+      "agent_version": "baseline",
+      "overall_score": 61.54,
+      "speech_score": 70,
+      "vote_score": 57.31,
+      "skill_score": 0,
+      "decision_count": 12,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "10号",
+      "role": "村民",
+      "agent_version": "baseline",
+      "overall_score": 60.12,
+      "speech_score": 0,
+      "vote_score": 60.12,
+      "skill_score": 0,
+      "decision_count": 8,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "9号",
+      "role": "村民",
+      "agent_version": "baseline",
+      "overall_score": 57.43,
+      "speech_score": 0,
+      "vote_score": 60.0,
+      "skill_score": 42.0,
+      "decision_count": 7,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "7号",
+      "role": "猎人",
+      "agent_version": "baseline",
+      "overall_score": 55.2,
+      "speech_score": 0,
+      "vote_score": 58.5,
+      "skill_score": 42.0,
+      "decision_count": 5,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "5号",
+      "role": "预言家",
+      "agent_version": "baseline",
+      "overall_score": 52.25,
+      "speech_score": 0,
+      "vote_score": 61.75,
+      "skill_score": 42.75,
+      "decision_count": 4,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "1号",
+      "role": "狼人",
+      "agent_version": "baseline",
+      "overall_score": 47.67,
+      "speech_score": 0,
+      "vote_score": 44.0,
+      "skill_score": 55.0,
+      "decision_count": 3,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "4号",
+      "role": "狼人",
+      "agent_version": "baseline",
+      "overall_score": 41.46,
+      "speech_score": 0,
+      "vote_score": 36.56,
+      "skill_score": 51.25,
+      "decision_count": 12,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "2号",
+      "role": "狼人",
+      "agent_version": "baseline",
+      "overall_score": 40.5,
+      "speech_score": 0,
+      "vote_score": 33.25,
+      "skill_score": 55.0,
+      "decision_count": 6,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "3号",
+      "role": "狼人",
+      "agent_version": "baseline",
+      "overall_score": 37.33,
+      "speech_score": 0,
+      "vote_score": 28.5,
+      "skill_score": 55.0,
+      "decision_count": 9,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "8号",
+      "role": "守护者",
+      "agent_version": "baseline",
+      "overall_score": 37.06,
+      "speech_score": 0,
+      "vote_score": 37.62,
+      "skill_score": 36.5,
+      "decision_count": 16,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "11号",
+      "role": "村民",
+      "agent_version": "baseline",
+      "overall_score": 26.62,
+      "speech_score": 0,
+      "vote_score": 26.62,
+      "skill_score": 0,
+      "decision_count": 8,
+      "critical_mistakes": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": 5,
+      "severity": "medium",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能目标异常",
+      "evidence": "技能目标指向自己，通常信息增量或收益较低。",
+      "recommendation": "为每个技能设置合法目标过滤器。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 1
+    },
+    {
+      "id": 9,
+      "severity": "medium",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能目标异常",
+      "evidence": "技能目标指向自己，通常信息增量或收益较低。",
+      "recommendation": "为每个技能设置合法目标过滤器。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 1
+    },
+    {
+      "id": 22,
+      "severity": "medium",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "11号（村民）投向 9号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 1
+    },
+    {
+      "id": 24,
+      "severity": "medium",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "11号（村民）投向 9号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 1
+    },
+    {
+      "id": 33,
+      "severity": "medium",
+      "player": "2号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "狼人内投风险",
+      "evidence": "狼人投向狼队友，若无明确倒钩收益会损害阵营胜率。",
+      "recommendation": "只有在能换取长期身份收益时才倒钩。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 2
+    },
+    {
+      "id": 35,
+      "severity": "medium",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "狼人内投风险",
+      "evidence": "狼人投向狼队友，若无明确倒钩收益会损害阵营胜率。",
+      "recommendation": "只有在能换取长期身份收益时才倒钩。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 2
+    },
+    {
+      "id": 37,
+      "severity": "medium",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "狼人内投风险",
+      "evidence": "狼人投向狼队友，若无明确倒钩收益会损害阵营胜率。",
+      "recommendation": "只有在能换取长期身份收益时才倒钩。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 2
+    },
+    {
+      "id": 44,
+      "severity": "medium",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "11号（村民）投向 9号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 2
+    },
+    {
+      "id": 46,
+      "severity": "medium",
+      "player": "2号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "狼人内投风险",
+      "evidence": "狼人投向狼队友，若无明确倒钩收益会损害阵营胜率。",
+      "recommendation": "只有在能换取长期身份收益时才倒钩。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 2
+    },
+    {
+      "id": 47,
+      "severity": "medium",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "狼人内投风险",
+      "evidence": "狼人投向狼队友，若无明确倒钩收益会损害阵营胜率。",
+      "recommendation": "只有在能换取长期身份收益时才倒钩。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 2
+    },
+    {
+      "id": 48,
+      "severity": "medium",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "狼人内投风险",
+      "evidence": "狼人投向狼队友，若无明确倒钩收益会损害阵营胜率。",
+      "recommendation": "只有在能换取长期身份收益时才倒钩。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 2
+    },
+    {
+      "id": 49,
+      "severity": "medium",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "11号（村民）投向 9号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 2
+    },
+    {
+      "id": 58,
+      "severity": "medium",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "狼人内投风险",
+      "evidence": "狼人投向狼队友，若无明确倒钩收益会损害阵营胜率。",
+      "recommendation": "只有在能换取长期身份收益时才倒钩。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 3
+    },
+    {
+      "id": 62,
+      "severity": "medium",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "8号（守护者）投向 10号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 8号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 3
+    },
+    {
+      "id": 66,
+      "severity": "medium",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "11号（村民）投向 9号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 3
+    },
+    {
+      "id": 68,
+      "severity": "medium",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "狼人内投风险",
+      "evidence": "狼人投向狼队友，若无明确倒钩收益会损害阵营胜率。",
+      "recommendation": "只有在能换取长期身份收益时才倒钩。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 3
+    },
+    {
+      "id": 69,
+      "severity": "medium",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "8号（守护者）投向 10号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 8号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 3
+    },
+    {
+      "id": 70,
+      "severity": "medium",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "11号（村民）投向 9号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 3
+    },
+    {
+      "id": 80,
+      "severity": "medium",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "8号（守护者）投向 10号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 8号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 4
+    },
+    {
+      "id": 84,
+      "severity": "medium",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "8号（守护者）投向 10号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 8号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 4
+    },
+    {
+      "id": 1,
+      "severity": "low",
+      "player": "1号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 2,
+      "severity": "low",
+      "player": "2号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 3,
+      "severity": "low",
+      "player": "3号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 4,
+      "severity": "low",
+      "player": "4号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 6,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 7,
+      "severity": "low",
+      "player": "5号",
+      "role": "预言家",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 8,
+      "severity": "low",
+      "player": "6号",
+      "role": "女巫",
+      "category": "speech",
+      "title": "缺少证据链",
+      "evidence": "发言有观点但没有引用发言、投票或技能信息。",
+      "recommendation": "要求 Agent 使用“观点-证据-风险-行动”模板。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -12,
+      "round": 1
+    },
+    {
+      "id": 10,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 11,
+      "severity": "low",
+      "player": "1号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 12,
+      "severity": "low",
+      "player": "2号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 13,
+      "severity": "low",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 14,
+      "severity": "low",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 15,
+      "severity": "low",
+      "player": "5号",
+      "role": "预言家",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 16,
+      "severity": "low",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 17,
+      "severity": "low",
+      "player": "7号",
+      "role": "猎人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 18,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 19,
+      "severity": "low",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 20,
+      "severity": "low",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 21,
+      "severity": "low",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 23,
+      "severity": "low",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 25,
+      "severity": "low",
+      "player": "2号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 2
+    },
+    {
+      "id": 26,
+      "severity": "low",
+      "player": "3号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 2
+    },
+    {
+      "id": 27,
+      "severity": "low",
+      "player": "4号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 2
+    },
+    {
+      "id": 28,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 2
+    },
+    {
+      "id": 29,
+      "severity": "low",
+      "player": "6号",
+      "role": "女巫",
+      "category": "speech",
+      "title": "缺少证据链",
+      "evidence": "发言有观点但没有引用发言、投票或技能信息。",
+      "recommendation": "要求 Agent 使用“观点-证据-风险-行动”模板。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -12,
+      "round": 2
+    },
+    {
+      "id": 30,
+      "severity": "low",
+      "player": "5号",
+      "role": "预言家",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 2
+    },
+    {
+      "id": 31,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 2
+    },
+    {
+      "id": 32,
+      "severity": "low",
+      "player": "2号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 34,
+      "severity": "low",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 36,
+      "severity": "low",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 38,
+      "severity": "low",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 39,
+      "severity": "low",
+      "player": "7号",
+      "role": "猎人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 40,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 41,
+      "severity": "low",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 42,
+      "severity": "low",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 43,
+      "severity": "low",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 45,
+      "severity": "low",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 2
+    },
+    {
+      "id": 50,
+      "severity": "low",
+      "player": "3号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 3
+    },
+    {
+      "id": 51,
+      "severity": "low",
+      "player": "4号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 3
+    },
+    {
+      "id": 52,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 3
+    },
+    {
+      "id": 53,
+      "severity": "low",
+      "player": "6号",
+      "role": "女巫",
+      "category": "speech",
+      "title": "缺少证据链",
+      "evidence": "发言有观点但没有引用发言、投票或技能信息。",
+      "recommendation": "要求 Agent 使用“观点-证据-风险-行动”模板。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -12,
+      "round": 3
+    },
+    {
+      "id": 54,
+      "severity": "low",
+      "player": "7号",
+      "role": "猎人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 3
+    },
+    {
+      "id": 55,
+      "severity": "low",
+      "player": "间谍团队",
+      "role": "未知",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 3
+    },
+    {
+      "id": 56,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 3
+    },
+    {
+      "id": 57,
+      "severity": "low",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 3
+    },
+    {
+      "id": 59,
+      "severity": "low",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 3
+    },
+    {
+      "id": 60,
+      "severity": "low",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 3
+    },
+    {
+      "id": 61,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 3
+    },
+    {
+      "id": 63,
+      "severity": "low",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 3
+    },
+    {
+      "id": 64,
+      "severity": "low",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 3
+    },
+    {
+      "id": 65,
+      "severity": "low",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 3
+    },
+    {
+      "id": 67,
+      "severity": "low",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 3
+    },
+    {
+      "id": 71,
+      "severity": "low",
+      "player": "4号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 4
+    },
+    {
+      "id": 72,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 4
+    },
+    {
+      "id": 73,
+      "severity": "low",
+      "player": "6号",
+      "role": "女巫",
+      "category": "speech",
+      "title": "缺少证据链",
+      "evidence": "发言有观点但没有引用发言、投票或技能信息。",
+      "recommendation": "要求 Agent 使用“观点-证据-风险-行动”模板。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -12,
+      "round": 4
+    },
+    {
+      "id": 74,
+      "severity": "low",
+      "player": "9号",
+      "role": "村民",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 4
+    },
+    {
+      "id": 75,
+      "severity": "low",
+      "player": "间谍团队",
+      "role": "未知",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 4
+    },
+    {
+      "id": 76,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 4
+    },
+    {
+      "id": 77,
+      "severity": "low",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 4
+    },
+    {
+      "id": 78,
+      "severity": "low",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 4
+    },
+    {
+      "id": 79,
+      "severity": "low",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 4
+    },
+    {
+      "id": 81,
+      "severity": "low",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 4
+    },
+    {
+      "id": 82,
+      "severity": "low",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 4
+    },
+    {
+      "id": 83,
+      "severity": "low",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 4
+    }
+  ],
+  "counterfactuals": [
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+    "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+    "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+    "若 11号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。"
+  ],
+  "events": [
+    {
+      "id": 1,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "1号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:37:08\", \"round\": 1, \"phase\": \"werewolf\", \"player\": \"老油条\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"知心姐\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 2,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "2号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:37:08\", \"round\": 1, \"phase\": \"werewolf\", \"player\": \"逻辑怪\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"知心姐\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 3,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "3号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:37:08\", \"round\": 1, \"phase\": \"werewolf\", \"player\": \"小透明\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"知心姐\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 4,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "4号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:37:08\", \"round\": 1, \"phase\": \"werewolf\", \"player\": \"卷王\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"知心姐\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 5,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "action": "加密保护",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:37:11\", \"round\": 1, \"phase\": \"guard\", \"player\": \"知心姐\", \"role\": \"守护者\", \"action\": \"加密保护\", \"target\": \"知心姐\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 20.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 6,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "5号",
+      "role": "预言家",
+      "category": "skill",
+      "action": "HR背调",
+      "target": "1号",
+      "reason": "背调结果：狼人",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:37:12\", \"round\": 1, \"phase\": \"seer\", \"player\": \"PUA总裁\", \"role\": \"预言家\", \"action\": \"HR背调\", \"target\": \"老油条\", \"reasoning_steps\": null, \"key_evidence\": \"背调结果：狼人\", \"full_output\": null}",
+      "metadata": {
+        "key_evidence": "背调结果：狼人"
+      },
+      "score": 43.5,
+      "metrics": {
+        "reason_len": 7
+      }
+    },
+    {
+      "id": 7,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "6号",
+      "role": "女巫",
+      "category": "speech",
+      "action": "CEO观望",
+      "target": null,
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:37:16\", \"round\": 1, \"phase\": \"witch\", \"player\": \"表格人\", \"role\": \"女巫\", \"action\": \"CEO观望\", \"target\": null, \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 70,
+      "metrics": {
+        "length": 226,
+        "evidence_hits": 0,
+        "hedge_hits": 0
+      }
+    },
+    {
+      "id": 8,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "间谍团队",
+      "role": "未知",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "8号",
+      "reason": "窃取目标知心姐，被加密保护抵消",
+      "raw": "{\"event_type\": \"skill_resolution\", \"timestamp\": \"2026-05-25T22:37:16\", \"round\": 1, \"skill_type\": \"spy_steal\", \"source_player\": \"间谍团队\", \"target_player\": \"知心姐\", \"result\": \"窃取目标知心姐，被加密保护抵消\", \"rule_applied\": null}",
+      "metadata": {
+        "rule_applied": null
+      },
+      "score": 77.5,
+      "metrics": {
+        "reason_len": 15
+      }
+    },
+    {
+      "id": 9,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "action": "加密保护",
+      "target": "8号",
+      "reason": "加密保护成功",
+      "raw": "{\"event_type\": \"skill_resolution\", \"timestamp\": \"2026-05-25T22:37:16\", \"round\": 1, \"skill_type\": \"guard_protect\", \"source_player\": \"知心姐\", \"target_player\": \"知心姐\", \"result\": \"加密保护成功\", \"rule_applied\": null}",
+      "metadata": {
+        "rule_applied": null
+      },
+      "score": 23.0,
+      "metrics": {
+        "reason_len": 6
+      }
+    },
+    {
+      "id": 11,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "1号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"vote\": \"8号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 27.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 12,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "2号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"vote\": \"8号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 27.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 13,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"vote\": \"8号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 27.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 14,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "8号",
+      "reason": "",
+      "raw": "{\"vote\": \"8号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 27.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 15,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "5号",
+      "role": "预言家",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "",
+      "raw": "{\"vote\": \"1号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 16,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "",
+      "raw": "{\"vote\": \"1号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 17,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "7号",
+      "role": "猎人",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "",
+      "raw": "{\"vote\": \"1号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 18,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "",
+      "raw": "{\"vote\": \"1号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 19,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "",
+      "raw": "{\"vote\": \"1号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 20,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "",
+      "raw": "{\"vote\": \"1号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 21,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "9号",
+      "reason": "",
+      "raw": "{\"vote\": \"9号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 22,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "",
+      "raw": "{\"vote\": \"1号\", \"voted_out\": \"老油条\", \"vote_count\": 7}",
+      "metadata": {
+        "voted_out": "老油条",
+        "vote_count": 7
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 23,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "1号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "8号",
+      "reason": "根据昨晚的讨论和今天大家的意见，我还是觉得知心姐的行为有些可疑。",
+      "raw": "{\"vote\": \"知心姐\", \"reason\": \"根据昨晚的讨论和今天大家的意见，我还是觉得知心姐的行为有些可疑。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "根据昨晚的讨论和今天大家的意见，我还是觉得知心姐的行为有些可疑。"
+      },
+      "score": 61.0,
+      "metrics": {
+        "reason_len": 32,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 24,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "2号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "8号",
+      "reason": "基于昨晚的讨论和老油条提出的怀疑，尽管有其他声音，但目前还是跟随多数意见。",
+      "raw": "{\"vote\": \"知心姐\", \"reason\": \"基于昨晚的讨论和老油条提出的怀疑，尽管有其他声音，但目前还是跟随多数意见。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "基于昨晚的讨论和老油条提出的怀疑，尽管有其他声音，但目前还是跟随多数意见。"
+      },
+      "score": 63.5,
+      "metrics": {
+        "reason_len": 37,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 25,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "8号",
+      "reason": "根据之前的讨论和大家的意见，决定跟随团队计划投票。",
+      "raw": "{\"vote\": \"知心姐\", \"reason\": \"根据之前的讨论和大家的意见，决定跟随团队计划投票。\", \"suspicion_level\": 5}",
+      "metadata": {
+        "key_evidence": "根据之前的讨论和大家的意见，决定跟随团队计划投票。"
+      },
+      "score": 57.5,
+      "metrics": {
+        "reason_len": 25,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 26,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "8号",
+      "reason": "尽管老油条的动机可疑，但知心姐的行为也确实存在疑点。",
+      "raw": "{\"vote\": \"知心姐\", \"reason\": \"尽管老油条的动机可疑，但知心姐的行为也确实存在疑点。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "尽管老油条的动机可疑，但知心姐的行为也确实存在疑点。"
+      },
+      "score": 58.0,
+      "metrics": {
+        "reason_len": 26,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 27,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "5号",
+      "role": "预言家",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "老油条的行为模式显示他可能在试图转移视线，这是间谍的常见策略。",
+      "raw": "{\"vote\": \"老油条\", \"reason\": \"老油条的行为模式显示他可能在试图转移视线，这是间谍的常见策略。\", \"suspicion_level\": 9}",
+      "metadata": {
+        "key_evidence": "老油条的行为模式显示他可能在试图转移视线，这是间谍的常见策略。"
+      },
+      "score": 78.5,
+      "metrics": {
+        "reason_len": 31,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 28,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "试图转移视线，自身被多人质疑",
+      "raw": "{\"vote\": \"老油条\", \"reason\": \"试图转移视线，自身被多人质疑\", \"suspicion_level\": 8}",
+      "metadata": {
+        "key_evidence": "试图转移视线，自身被多人质疑"
+      },
+      "score": 70.0,
+      "metrics": {
+        "reason_len": 14,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 29,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "7号",
+      "role": "猎人",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "他主动引导大家怀疑知心姐，但自身也被质疑动机。",
+      "raw": "{\"vote\": \"老油条\", \"reason\": \"他主动引导大家怀疑知心姐，但自身也被质疑动机。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "他主动引导大家怀疑知心姐，但自身也被质疑动机。"
+      },
+      "score": 74.5,
+      "metrics": {
+        "reason_len": 23,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 30,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "老油条主动提出对知心姐的怀疑，同时被PUA总裁、嘴炮王及暴躁哥质疑",
+      "raw": "{\"vote\": \"老油条\", \"reason\": \"老油条主动提出对知心姐的怀疑，同时被PUA总裁、嘴炮王及暴躁哥质疑\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "老油条主动提出对知心姐的怀疑，同时被PUA总裁、嘴炮王及暴躁哥质疑"
+      },
+      "score": 79.5,
+      "metrics": {
+        "reason_len": 33,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 31,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "老油条主动引导嫌疑至知心姐，但自身也被质疑，行为动机可疑。",
+      "raw": "{\"vote\": \"老油条\", \"reason\": \"老油条主动引导嫌疑至知心姐，但自身也被质疑，行为动机可疑。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "老油条主动引导嫌疑至知心姐，但自身也被质疑，行为动机可疑。"
+      },
+      "score": 77.5,
+      "metrics": {
+        "reason_len": 29,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 32,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "老油条主动提出对知心姐的怀疑，但被PUA总裁、嘴炮王及我质疑，他动机可疑。",
+      "raw": "{\"vote\": \"老油条\", \"reason\": \"老油条主动提出对知心姐的怀疑，但被PUA总裁、嘴炮王及我质疑，他动机可疑。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "老油条主动提出对知心姐的怀疑，但被PUA总裁、嘴炮王及我质疑，他动机可疑。"
+      },
+      "score": 81.5,
+      "metrics": {
+        "reason_len": 37,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 33,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "9号",
+      "reason": "当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象",
+      "raw": "{\"vote\": \"沉默侠\", \"reason\": \"当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象"
+      },
+      "score": 30.5,
+      "metrics": {
+        "reason_len": 27,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 34,
+      "round": 1,
+      "phase": "白天投票",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "1号",
+      "reason": "老油条主动提出对知心姐的怀疑，同时被多人质疑其动机。这可能是在转移视线。",
+      "raw": "{\"vote\": \"老油条\", \"reason\": \"老油条主动提出对知心姐的怀疑，同时被多人质疑其动机。这可能是在转移视线。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "老油条主动提出对知心姐的怀疑，同时被多人质疑其动机。这可能是在转移视线。"
+      },
+      "score": 81.0,
+      "metrics": {
+        "reason_len": 36,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 35,
+      "round": 2,
+      "phase": "夜晚",
+      "player": "2号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "5号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:40:21\", \"round\": 2, \"phase\": \"werewolf\", \"player\": \"逻辑怪\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"PUA总裁\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 36,
+      "round": 2,
+      "phase": "夜晚",
+      "player": "3号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "5号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:40:21\", \"round\": 2, \"phase\": \"werewolf\", \"player\": \"小透明\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"PUA总裁\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 37,
+      "round": 2,
+      "phase": "夜晚",
+      "player": "4号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "5号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:40:21\", \"round\": 2, \"phase\": \"werewolf\", \"player\": \"卷王\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"PUA总裁\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 38,
+      "round": 2,
+      "phase": "夜晚",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "action": "加密保护",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:40:25\", \"round\": 2, \"phase\": \"guard\", \"player\": \"知心姐\", \"role\": \"守护者\", \"action\": \"加密保护\", \"target\": \"逻辑怪\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 40.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 39,
+      "round": 2,
+      "phase": "夜晚",
+      "player": "6号",
+      "role": "女巫",
+      "category": "speech",
+      "action": "CEO观望",
+      "target": null,
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:40:49\", \"round\": 2, \"phase\": \"witch\", \"player\": \"表格人\", \"role\": \"女巫\", \"action\": \"CEO观望\", \"target\": null, \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 70,
+      "metrics": {
+        "length": 226,
+        "evidence_hits": 0,
+        "hedge_hits": 0
+      }
+    },
+    {
+      "id": 40,
+      "round": 2,
+      "phase": "夜晚",
+      "player": "5号",
+      "role": "预言家",
+      "category": "skill",
+      "action": "死亡",
+      "target": null,
+      "reason": "间谍窃取",
+      "raw": "{\"event_type\": \"death\", \"timestamp\": \"2026-05-25T22:40:49\", \"round\": 2, \"player\": \"PUA总裁\", \"cause\": \"间谍窃取\"}",
+      "metadata": {
+        "cause": "间谍窃取"
+      },
+      "score": 42.0,
+      "metrics": {
+        "reason_len": 4
+      }
+    },
+    {
+      "id": 41,
+      "round": 2,
+      "phase": "夜晚",
+      "player": "间谍团队",
+      "role": "未知",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "5号",
+      "reason": "窃取目标PUA总裁",
+      "raw": "{\"event_type\": \"skill_resolution\", \"timestamp\": \"2026-05-25T22:40:49\", \"round\": 2, \"skill_type\": \"spy_steal\", \"source_player\": \"间谍团队\", \"target_player\": \"PUA总裁\", \"result\": \"窃取目标PUA总裁\", \"rule_applied\": null}",
+      "metadata": {
+        "rule_applied": null
+      },
+      "score": 74.5,
+      "metrics": {
+        "reason_len": 9
+      }
+    },
+    {
+      "id": 42,
+      "round": 2,
+      "phase": "夜晚",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "action": "加密保护",
+      "target": "2号",
+      "reason": "加密保护成功",
+      "raw": "{\"event_type\": \"skill_resolution\", \"timestamp\": \"2026-05-25T22:40:49\", \"round\": 2, \"skill_type\": \"guard_protect\", \"source_player\": \"知心姐\", \"target_player\": \"逻辑怪\", \"result\": \"加密保护成功\", \"rule_applied\": null}",
+      "metadata": {
+        "rule_applied": null
+      },
+      "score": 43.0,
+      "metrics": {
+        "reason_len": 6
+      }
+    },
+    {
+      "id": 44,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "2号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "",
+      "raw": "{\"vote\": \"4号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 7.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 45,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"vote\": \"2号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 7.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 46,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"vote\": \"2号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 7.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 47,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"vote\": \"2号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 48,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "7号",
+      "role": "猎人",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"vote\": \"2号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 49,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"vote\": \"2号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 50,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"vote\": \"2号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 51,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"vote\": \"2号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 52,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "9号",
+      "reason": "",
+      "raw": "{\"vote\": \"9号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 53,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "",
+      "raw": "{\"vote\": \"2号\", \"voted_out\": \"逻辑怪\", \"vote_count\": 8}",
+      "metadata": {
+        "voted_out": "逻辑怪",
+        "vote_count": 8
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 54,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "2号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "卷王的发言存在矛盾，且被嘴炮王质疑其动机。",
+      "raw": "{\"vote\": \"卷王\", \"reason\": \"卷王的发言存在矛盾，且被嘴炮王质疑其动机。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "卷王的发言存在矛盾，且被嘴炮王质疑其动机。"
+      },
+      "score": 35.5,
+      "metrics": {
+        "reason_len": 21,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 55,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "根据嘴炮王和暴躁哥的质疑，决定跟随多数人意见投票。",
+      "raw": "{\"vote\": \"逻辑怪\", \"reason\": \"根据嘴炮王和暴躁哥的质疑，决定跟随多数人意见投票。\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "根据嘴炮王和暴躁哥的质疑，决定跟随多数人意见投票。"
+      },
+      "score": 37.5,
+      "metrics": {
+        "reason_len": 25,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 56,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "逻辑怪建议转向观察其他人，但动机值得怀疑。",
+      "raw": "{\"vote\": \"逻辑怪\", \"reason\": \"逻辑怪建议转向观察其他人，但动机值得怀疑。\", \"suspicion_level\": 8}",
+      "metadata": {
+        "key_evidence": "逻辑怪建议转向观察其他人，但动机值得怀疑。"
+      },
+      "score": 35.5,
+      "metrics": {
+        "reason_len": 21,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 57,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "被嘴炮王质疑动机，发言异常",
+      "raw": "{\"vote\": \"逻辑怪\", \"reason\": \"被嘴炮王质疑动机，发言异常\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "被嘴炮王质疑动机，发言异常"
+      },
+      "score": 69.5,
+      "metrics": {
+        "reason_len": 13,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 58,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "7号",
+      "role": "猎人",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "他频繁转移视线，动机可疑。",
+      "raw": "{\"vote\": \"逻辑怪\", \"reason\": \"他频繁转移视线，动机可疑。\", \"suspicion_level\": 8}",
+      "metadata": {
+        "key_evidence": "他频繁转移视线，动机可疑。"
+      },
+      "score": 69.5,
+      "metrics": {
+        "reason_len": 13,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 59,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "PUA总裁被保护后，逻辑怪建议转向观察其他人，同时嘴炮王质疑逻辑怪动机",
+      "raw": "{\"vote\": \"逻辑怪\", \"reason\": \"PUA总裁被保护后，逻辑怪建议转向观察其他人，同时嘴炮王质疑逻辑怪动机\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "PUA总裁被保护后，逻辑怪建议转向观察其他人，同时嘴炮王质疑逻辑怪动机"
+      },
+      "score": 80.5,
+      "metrics": {
+        "reason_len": 35,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 60,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "逻辑怪建议转向观察其他人，但被嘴炮王质疑其动机。",
+      "raw": "{\"vote\": \"逻辑怪\", \"reason\": \"逻辑怪建议转向观察其他人，但被嘴炮王质疑其动机。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "逻辑怪建议转向观察其他人，但被嘴炮王质疑其动机。"
+      },
+      "score": 75.0,
+      "metrics": {
+        "reason_len": 24,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 61,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "逻辑怪有转移视线嫌疑，怀疑他在试图掩盖什么。",
+      "raw": "{\"vote\": \"逻辑怪\", \"reason\": \"逻辑怪有转移视线嫌疑，怀疑他在试图掩盖什么。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "逻辑怪有转移视线嫌疑，怀疑他在试图掩盖什么。"
+      },
+      "score": 74.0,
+      "metrics": {
+        "reason_len": 22,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 62,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "9号",
+      "reason": "当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象",
+      "raw": "{\"vote\": \"沉默侠\", \"reason\": \"当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象"
+      },
+      "score": 30.5,
+      "metrics": {
+        "reason_len": 27,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 63,
+      "round": 2,
+      "phase": "白天投票",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "2号",
+      "reason": "逻辑怪主动提出转向观察其他人，并被嘴炮王质疑其动机。这可能是在转移视线。",
+      "raw": "{\"vote\": \"逻辑怪\", \"reason\": \"逻辑怪主动提出转向观察其他人，并被嘴炮王质疑其动机。这可能是在转移视线。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "逻辑怪主动提出转向观察其他人，并被嘴炮王质疑其动机。这可能是在转移视线。"
+      },
+      "score": 81.0,
+      "metrics": {
+        "reason_len": 36,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 64,
+      "round": 3,
+      "phase": "夜晚",
+      "player": "3号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "7号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:43:09\", \"round\": 3, \"phase\": \"werewolf\", \"player\": \"小透明\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"嘴炮王\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 65,
+      "round": 3,
+      "phase": "夜晚",
+      "player": "4号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "7号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:43:09\", \"round\": 3, \"phase\": \"werewolf\", \"player\": \"卷王\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"嘴炮王\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 66,
+      "round": 3,
+      "phase": "夜晚",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "action": "加密保护",
+      "target": "6号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:43:18\", \"round\": 3, \"phase\": \"guard\", \"player\": \"知心姐\", \"role\": \"守护者\", \"action\": \"加密保护\", \"target\": \"表格人\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 40.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 67,
+      "round": 3,
+      "phase": "夜晚",
+      "player": "6号",
+      "role": "女巫",
+      "category": "speech",
+      "action": "CEO观望",
+      "target": null,
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:43:25\", \"round\": 3, \"phase\": \"witch\", \"player\": \"表格人\", \"role\": \"女巫\", \"action\": \"CEO观望\", \"target\": null, \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 70,
+      "metrics": {
+        "length": 226,
+        "evidence_hits": 0,
+        "hedge_hits": 0
+      }
+    },
+    {
+      "id": 68,
+      "round": 3,
+      "phase": "夜晚",
+      "player": "7号",
+      "role": "猎人",
+      "category": "skill",
+      "action": "死亡",
+      "target": null,
+      "reason": "间谍窃取",
+      "raw": "{\"event_type\": \"death\", \"timestamp\": \"2026-05-25T22:43:25\", \"round\": 3, \"player\": \"嘴炮王\", \"cause\": \"间谍窃取\"}",
+      "metadata": {
+        "cause": "间谍窃取"
+      },
+      "score": 42.0,
+      "metrics": {
+        "reason_len": 4
+      }
+    },
+    {
+      "id": 69,
+      "round": 3,
+      "phase": "夜晚",
+      "player": "间谍团队",
+      "role": "未知",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "7号",
+      "reason": "窃取目标嘴炮王",
+      "raw": "{\"event_type\": \"skill_resolution\", \"timestamp\": \"2026-05-25T22:43:25\", \"round\": 3, \"skill_type\": \"spy_steal\", \"source_player\": \"间谍团队\", \"target_player\": \"嘴炮王\", \"result\": \"窃取目标嘴炮王\", \"rule_applied\": null}",
+      "metadata": {
+        "rule_applied": null
+      },
+      "score": 58.5,
+      "metrics": {
+        "reason_len": 7
+      }
+    },
+    {
+      "id": 70,
+      "round": 3,
+      "phase": "夜晚",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "action": "加密保护",
+      "target": "6号",
+      "reason": "加密保护成功",
+      "raw": "{\"event_type\": \"skill_resolution\", \"timestamp\": \"2026-05-25T22:43:25\", \"round\": 3, \"skill_type\": \"guard_protect\", \"source_player\": \"知心姐\", \"target_player\": \"表格人\", \"result\": \"加密保护成功\", \"rule_applied\": null}",
+      "metadata": {
+        "rule_applied": null
+      },
+      "score": 43.0,
+      "metrics": {
+        "reason_len": 6
+      }
+    },
+    {
+      "id": 72,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "",
+      "raw": "{\"vote\": \"4号\", \"voted_out\": \"小透明\", \"vote_count\": 3}",
+      "metadata": {
+        "voted_out": "小透明",
+        "vote_count": 3
+      },
+      "score": 7.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 73,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "6号",
+      "reason": "",
+      "raw": "{\"vote\": \"6号\", \"voted_out\": \"小透明\", \"vote_count\": 3}",
+      "metadata": {
+        "voted_out": "小透明",
+        "vote_count": 3
+      },
+      "score": 27.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 74,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "action": "投票",
+      "target": "3号",
+      "reason": "",
+      "raw": "{\"vote\": \"3号\", \"voted_out\": \"小透明\", \"vote_count\": 3}",
+      "metadata": {
+        "voted_out": "小透明",
+        "vote_count": 3
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 75,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "action": "投票",
+      "target": "10号",
+      "reason": "",
+      "raw": "{\"vote\": \"10号\", \"voted_out\": \"小透明\", \"vote_count\": 3}",
+      "metadata": {
+        "voted_out": "小透明",
+        "vote_count": 3
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 76,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "",
+      "raw": "{\"vote\": \"4号\", \"voted_out\": \"小透明\", \"vote_count\": 3}",
+      "metadata": {
+        "voted_out": "小透明",
+        "vote_count": 3
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 77,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "3号",
+      "reason": "",
+      "raw": "{\"vote\": \"3号\", \"voted_out\": \"小透明\", \"vote_count\": 3}",
+      "metadata": {
+        "voted_out": "小透明",
+        "vote_count": 3
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 78,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "9号",
+      "reason": "",
+      "raw": "{\"vote\": \"9号\", \"voted_out\": \"小透明\", \"vote_count\": 3}",
+      "metadata": {
+        "voted_out": "小透明",
+        "vote_count": 3
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 79,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "3号",
+      "reason": "",
+      "raw": "{\"vote\": \"3号\", \"voted_out\": \"小透明\", \"vote_count\": 3}",
+      "metadata": {
+        "voted_out": "小透明",
+        "vote_count": 3
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 80,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "3号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "根据大家的讨论，决定跟随多数人意见投票。",
+      "raw": "{\"vote\": \"卷王\", \"reason\": \"根据大家的讨论，决定跟随多数人意见投票。\", \"suspicion_level\": 5}",
+      "metadata": {
+        "key_evidence": "根据大家的讨论，决定跟随多数人意见投票。"
+      },
+      "score": 35.0,
+      "metrics": {
+        "reason_len": 20,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 81,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "6号",
+      "reason": "表格人多次使用留人offer，动机值得怀疑。",
+      "raw": "{\"vote\": \"表格人\", \"reason\": \"表格人多次使用留人offer，动机值得怀疑。\", \"suspicion_level\": 8}",
+      "metadata": {
+        "key_evidence": "表格人多次使用留人offer，动机值得怀疑。"
+      },
+      "score": 56.0,
+      "metrics": {
+        "reason_len": 22,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 82,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "action": "投票",
+      "target": "3号",
+      "reason": "发言信息量少，难以判断立场",
+      "raw": "{\"vote\": \"小透明\", \"reason\": \"发言信息量少，难以判断立场\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "发言信息量少，难以判断立场"
+      },
+      "score": 69.5,
+      "metrics": {
+        "reason_len": 13,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 83,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "action": "投票",
+      "target": "10号",
+      "reason": "暴躁哥情绪激动，可能会影响团队决策",
+      "raw": "{\"vote\": \"暴躁哥\", \"reason\": \"暴躁哥情绪激动，可能会影响团队决策\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "暴躁哥情绪激动，可能会影响团队决策"
+      },
+      "score": 25.5,
+      "metrics": {
+        "reason_len": 17,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 84,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "9号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "卷王较为活跃但未被保护，存在潜在风险。",
+      "raw": "{\"vote\": \"卷王\", \"reason\": \"卷王较为活跃但未被保护，存在潜在风险。\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "卷王较为活跃但未被保护，存在潜在风险。"
+      },
+      "score": 72.5,
+      "metrics": {
+        "reason_len": 19,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 85,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "3号",
+      "reason": "小透明的发言总是模棱两可，难以判断其真实立场。",
+      "raw": "{\"vote\": \"小透明\", \"reason\": \"小透明的发言总是模棱两可，难以判断其真实立场。\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "小透明的发言总是模棱两可，难以判断其真实立场。"
+      },
+      "score": 74.5,
+      "metrics": {
+        "reason_len": 23,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 86,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "9号",
+      "reason": "当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象",
+      "raw": "{\"vote\": \"沉默侠\", \"reason\": \"当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象"
+      },
+      "score": 30.5,
+      "metrics": {
+        "reason_len": 27,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 87,
+      "round": 3,
+      "phase": "白天投票",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "3号",
+      "reason": "小透明的发言总是跟随他人，缺乏独立思考。这可能隐藏着问题。",
+      "raw": "{\"vote\": \"小透明\", \"reason\": \"小透明的发言总是跟随他人，缺乏独立思考。这可能隐藏着问题。\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "小透明的发言总是跟随他人，缺乏独立思考。这可能隐藏着问题。"
+      },
+      "score": 77.5,
+      "metrics": {
+        "reason_len": 29,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 88,
+      "round": 4,
+      "phase": "夜晚",
+      "player": "4号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "9号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:45:32\", \"round\": 4, \"phase\": \"werewolf\", \"player\": \"卷王\", \"role\": \"狼人\", \"action\": \"间谍窃取\", \"target\": \"沉默侠\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 40.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 89,
+      "round": 4,
+      "phase": "夜晚",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "action": "加密保护",
+      "target": "4号",
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:45:45\", \"round\": 4, \"phase\": \"guard\", \"player\": \"知心姐\", \"role\": \"守护者\", \"action\": \"加密保护\", \"target\": \"卷王\", \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 40.0,
+      "metrics": {
+        "reason_len": 0
+      }
+    },
+    {
+      "id": 90,
+      "round": 4,
+      "phase": "夜晚",
+      "player": "6号",
+      "role": "女巫",
+      "category": "speech",
+      "action": "CEO观望",
+      "target": null,
+      "reason": "",
+      "raw": "{\"event_type\": \"decision\", \"timestamp\": \"2026-05-25T22:45:53\", \"round\": 4, \"phase\": \"witch\", \"player\": \"表格人\", \"role\": \"女巫\", \"action\": \"CEO观望\", \"target\": null, \"reasoning_steps\": null, \"key_evidence\": null, \"full_output\": null}",
+      "metadata": {},
+      "score": 70,
+      "metrics": {
+        "length": 226,
+        "evidence_hits": 0,
+        "hedge_hits": 0
+      }
+    },
+    {
+      "id": 91,
+      "round": 4,
+      "phase": "夜晚",
+      "player": "9号",
+      "role": "村民",
+      "category": "skill",
+      "action": "死亡",
+      "target": null,
+      "reason": "间谍窃取",
+      "raw": "{\"event_type\": \"death\", \"timestamp\": \"2026-05-25T22:45:53\", \"round\": 4, \"player\": \"沉默侠\", \"cause\": \"间谍窃取\"}",
+      "metadata": {
+        "cause": "间谍窃取"
+      },
+      "score": 42.0,
+      "metrics": {
+        "reason_len": 4
+      }
+    },
+    {
+      "id": 92,
+      "round": 4,
+      "phase": "夜晚",
+      "player": "间谍团队",
+      "role": "未知",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "9号",
+      "reason": "窃取目标沉默侠",
+      "raw": "{\"event_type\": \"skill_resolution\", \"timestamp\": \"2026-05-25T22:45:53\", \"round\": 4, \"skill_type\": \"spy_steal\", \"source_player\": \"间谍团队\", \"target_player\": \"沉默侠\", \"result\": \"窃取目标沉默侠\", \"rule_applied\": null}",
+      "metadata": {
+        "rule_applied": null
+      },
+      "score": 43.5,
+      "metrics": {
+        "reason_len": 7
+      }
+    },
+    {
+      "id": 93,
+      "round": 4,
+      "phase": "夜晚",
+      "player": "8号",
+      "role": "守护者",
+      "category": "skill",
+      "action": "加密保护",
+      "target": "4号",
+      "reason": "加密保护成功",
+      "raw": "{\"event_type\": \"skill_resolution\", \"timestamp\": \"2026-05-25T22:45:53\", \"round\": 4, \"skill_type\": \"guard_protect\", \"source_player\": \"知心姐\", \"target_player\": \"卷王\", \"result\": \"加密保护成功\", \"rule_applied\": null}",
+      "metadata": {
+        "rule_applied": null
+      },
+      "score": 43.0,
+      "metrics": {
+        "reason_len": 6
+      }
+    },
+    {
+      "id": 95,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "11号",
+      "reason": "",
+      "raw": "{\"vote\": \"11号\", \"voted_out\": \"卷王\", \"vote_count\": 4}",
+      "metadata": {
+        "voted_out": "卷王",
+        "vote_count": 4
+      },
+      "score": 27.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 96,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "",
+      "raw": "{\"vote\": \"4号\", \"voted_out\": \"卷王\", \"vote_count\": 4}",
+      "metadata": {
+        "voted_out": "卷王",
+        "vote_count": 4
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 97,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "action": "投票",
+      "target": "10号",
+      "reason": "",
+      "raw": "{\"vote\": \"10号\", \"voted_out\": \"卷王\", \"vote_count\": 4}",
+      "metadata": {
+        "voted_out": "卷王",
+        "vote_count": 4
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 98,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "",
+      "raw": "{\"vote\": \"4号\", \"voted_out\": \"卷王\", \"vote_count\": 4}",
+      "metadata": {
+        "voted_out": "卷王",
+        "vote_count": 4
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 99,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "",
+      "raw": "{\"vote\": \"4号\", \"voted_out\": \"卷王\", \"vote_count\": 4}",
+      "metadata": {
+        "voted_out": "卷王",
+        "vote_count": 4
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 100,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "",
+      "raw": "{\"vote\": \"4号\", \"voted_out\": \"卷王\", \"vote_count\": 4}",
+      "metadata": {
+        "voted_out": "卷王",
+        "vote_count": 4
+      },
+      "score": 45.0,
+      "metrics": {
+        "reason_len": 0,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 101,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "4号",
+      "role": "狼人",
+      "category": "vote",
+      "action": "投票",
+      "target": "11号",
+      "reason": "铁头哥多次跟随别人的意见，缺乏独立判断。",
+      "raw": "{\"vote\": \"铁头哥\", \"reason\": \"铁头哥多次跟随别人的意见，缺乏独立判断。\", \"suspicion_level\": 8}",
+      "metadata": {
+        "key_evidence": "铁头哥多次跟随别人的意见，缺乏独立判断。"
+      },
+      "score": 55.0,
+      "metrics": {
+        "reason_len": 20,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 102,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "6号",
+      "role": "女巫",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "发言频繁，但缺乏实质性证据",
+      "raw": "{\"vote\": \"卷王\", \"reason\": \"发言频繁，但缺乏实质性证据\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "发言频繁，但缺乏实质性证据"
+      },
+      "score": 69.5,
+      "metrics": {
+        "reason_len": 13,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 103,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "8号",
+      "role": "守护者",
+      "category": "vote",
+      "action": "投票",
+      "target": "10号",
+      "reason": "暴躁哥情绪激动，可能会影响团队决策",
+      "raw": "{\"vote\": \"暴躁哥\", \"reason\": \"暴躁哥情绪激动，可能会影响团队决策\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "暴躁哥情绪激动，可能会影响团队决策"
+      },
+      "score": 25.5,
+      "metrics": {
+        "reason_len": 17,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 104,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "10号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "卷王发言过于急躁，容易误导大家。",
+      "raw": "{\"vote\": \"卷王\", \"reason\": \"卷王发言过于急躁，容易误导大家。\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "卷王发言过于急躁，容易误导大家。"
+      },
+      "score": 71.0,
+      "metrics": {
+        "reason_len": 16,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 105,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "11号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象",
+      "raw": "{\"vote\": \"卷王\", \"reason\": \"当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象\", \"suspicion_level\": 6}",
+      "metadata": {
+        "key_evidence": "当前信息不足以让我做出明确判断，选择一个嫌疑较小的对象"
+      },
+      "score": 76.5,
+      "metrics": {
+        "reason_len": 27,
+        "suspicion_level": 0.0
+      }
+    },
+    {
+      "id": 106,
+      "round": 4,
+      "phase": "白天投票",
+      "player": "12号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "4号",
+      "reason": "卷王频繁质疑他人但缺乏具体证据。这可能是在转移视线。",
+      "raw": "{\"vote\": \"卷王\", \"reason\": \"卷王频繁质疑他人但缺乏具体证据。这可能是在转移视线。\", \"suspicion_level\": 7}",
+      "metadata": {
+        "key_evidence": "卷王频繁质疑他人但缺乏具体证据。这可能是在转移视线。"
+      },
+      "score": 76.0,
+      "metrics": {
+        "reason_len": 26,
+        "suspicion_level": 0.0
+      }
+    }
+  ]
+}

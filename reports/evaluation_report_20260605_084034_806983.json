@@ -1,0 +1,497 @@
+{
+  "generated_at": "2026-06-05T08:40:34",
+  "agent_version": "baseline",
+  "summary": {
+    "overall_score": 11.15,
+    "decision_count": 9,
+    "player_count": 6,
+    "high_severity_mistakes": 4,
+    "medium_severity_mistakes": 7,
+    "coverage": {
+      "skill": 4,
+      "speech": 2,
+      "vote": 3
+    }
+  },
+  "dimension_scores": {
+    "skill": 0.0,
+    "speech": 25.17,
+    "vote": 16.67
+  },
+  "roles": {
+    "1号": "狼人",
+    "2号": "预言家",
+    "3号": "女巫",
+    "4号": "猎人",
+    "5号": "村民",
+    "6号": "村民"
+  },
+  "seat_characters": {},
+  "leaderboard": [
+    {
+      "player": "5号",
+      "role": "村民",
+      "agent_version": "baseline",
+      "overall_score": 18.25,
+      "speech_score": 28.0,
+      "vote_score": 8.5,
+      "skill_score": 0,
+      "decision_count": 2,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "2号",
+      "role": "预言家",
+      "agent_version": "baseline",
+      "overall_score": 16.0,
+      "speech_score": 0,
+      "vote_score": 32.0,
+      "skill_score": 0.0,
+      "decision_count": 2,
+      "critical_mistakes": 1
+    },
+    {
+      "player": "6号",
+      "role": "村民",
+      "agent_version": "baseline",
+      "overall_score": 15.92,
+      "speech_score": 22.33,
+      "vote_score": 9.5,
+      "skill_score": 0,
+      "decision_count": 2,
+      "critical_mistakes": 0
+    },
+    {
+      "player": "1号",
+      "role": "狼人",
+      "agent_version": "baseline",
+      "overall_score": 0.0,
+      "speech_score": 0,
+      "vote_score": 0,
+      "skill_score": 0.0,
+      "decision_count": 1,
+      "critical_mistakes": 1
+    },
+    {
+      "player": "3号",
+      "role": "女巫",
+      "agent_version": "baseline",
+      "overall_score": 0.0,
+      "speech_score": 0,
+      "vote_score": 0,
+      "skill_score": 0.0,
+      "decision_count": 1,
+      "critical_mistakes": 1
+    },
+    {
+      "player": "4号",
+      "role": "猎人",
+      "agent_version": "baseline",
+      "overall_score": 0.0,
+      "speech_score": 0,
+      "vote_score": 0,
+      "skill_score": 0.0,
+      "decision_count": 1,
+      "critical_mistakes": 1
+    }
+  ],
+  "findings": [
+    {
+      "id": 1,
+      "severity": "high",
+      "player": "1号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "间谍误窃队友",
+      "evidence": "间谍目标是 1号（间谍）。",
+      "recommendation": "夜间目标应排除间谍队友，并优先窃取HR总监/CEO等高价值好人。",
+      "counterfactual": "若间谍队改窃 2号，可削弱公司技能链，而不是自损间谍坑。",
+      "score_delta": -70,
+      "round": 1
+    },
+    {
+      "id": 3,
+      "severity": "high",
+      "player": "2号",
+      "role": "预言家",
+      "category": "skill",
+      "title": "HR总监自背调",
+      "evidence": "HR总监浪费背调在自己身上。",
+      "recommendation": "优先背调发言强势、票型异常或被多人争议的玩家。",
+      "counterfactual": "若改查 1号，HR总监可产出背调查实信息，白天归票成功率显著提升。",
+      "score_delta": -60,
+      "round": 1
+    },
+    {
+      "id": 5,
+      "severity": "high",
+      "player": "3号",
+      "role": "女巫",
+      "category": "skill",
+      "title": "CEO辞退错好人",
+      "evidence": "CEO辞退 5号（村民）。",
+      "recommendation": "辞退信应保留给强间谍嫌疑或关键轮次，使用前结合票型和背调。",
+      "counterfactual": "若CEO保留辞退信或辞退 1号，公司阵营可避免关键轮次减员。",
+      "score_delta": -45,
+      "round": 1
+    },
+    {
+      "id": 7,
+      "severity": "high",
+      "player": "4号",
+      "role": "猎人",
+      "category": "skill",
+      "title": "法务总监诉讼错好人",
+      "evidence": "法务总监诉讼带走 6号（村民）。",
+      "recommendation": "临终技能应优先带走背调查实、身份对质失败或票型最可疑的目标。",
+      "counterfactual": "若法务总监诉讼目标改为 1号，可用临终技能换掉间谍坑。",
+      "score_delta": -50,
+      "round": 1
+    },
+    {
+      "id": 2,
+      "severity": "medium",
+      "player": "1号",
+      "role": "狼人",
+      "category": "skill",
+      "title": "技能目标异常",
+      "evidence": "技能目标指向自己，通常信息增量或收益较低。",
+      "recommendation": "为每个技能设置合法目标过滤器。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 1
+    },
+    {
+      "id": 4,
+      "severity": "medium",
+      "player": "2号",
+      "role": "预言家",
+      "category": "skill",
+      "title": "技能目标异常",
+      "evidence": "技能目标指向自己，通常信息增量或收益较低。",
+      "recommendation": "为每个技能设置合法目标过滤器。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 1
+    },
+    {
+      "id": 9,
+      "severity": "medium",
+      "player": "5号",
+      "role": "村民",
+      "category": "speech",
+      "title": "发言过短",
+      "evidence": "发言缺少可追溯推理，评委难以判断决策原因。",
+      "recommendation": "补充身份判断、证据来源和下一步策略。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 1
+    },
+    {
+      "id": 10,
+      "severity": "medium",
+      "player": "6号",
+      "role": "村民",
+      "category": "speech",
+      "title": "发言过短",
+      "evidence": "发言缺少可追溯推理，评委难以判断决策原因。",
+      "recommendation": "补充身份判断、证据来源和下一步策略。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -20,
+      "round": 1
+    },
+    {
+      "id": 11,
+      "severity": "medium",
+      "player": "2号",
+      "role": "预言家",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "2号（预言家）投向 3号（女巫）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 2号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 1
+    },
+    {
+      "id": 13,
+      "severity": "medium",
+      "player": "5号",
+      "role": "村民",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "5号（村民）投向 6号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 5号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 1
+    },
+    {
+      "id": 15,
+      "severity": "medium",
+      "player": "6号",
+      "role": "村民",
+      "category": "vote",
+      "title": "好人误投好人",
+      "evidence": "6号（村民）投向 5号（村民）。",
+      "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。",
+      "counterfactual": "若 6号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。",
+      "score_delta": -28,
+      "round": 1
+    },
+    {
+      "id": 6,
+      "severity": "low",
+      "player": "3号",
+      "role": "女巫",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 8,
+      "severity": "low",
+      "player": "4号",
+      "role": "猎人",
+      "category": "skill",
+      "title": "技能理由不足",
+      "evidence": "技能决策缺少解释，无法复盘。",
+      "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -15,
+      "round": 1
+    },
+    {
+      "id": 12,
+      "severity": "low",
+      "player": "5号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    },
+    {
+      "id": 14,
+      "severity": "low",
+      "player": "6号",
+      "role": "村民",
+      "category": "vote",
+      "title": "投票理由不足",
+      "evidence": "投票没有解释关键依据。",
+      "recommendation": "投票输出必须包含至少一个可验证证据。",
+      "counterfactual": "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+      "score_delta": -18,
+      "round": 1
+    }
+  ],
+  "counterfactuals": [
+    "若间谍队改窃 2号，可削弱公司技能链，而不是自损间谍坑。",
+    "若改查 1号，HR总监可产出背调查实信息，白天归票成功率显著提升。",
+    "若CEO保留辞退信或辞退 1号，公司阵营可避免关键轮次减员。",
+    "若法务总监诉讼目标改为 1号，可用临终技能换掉间谍坑。",
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。",
+    "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。"
+  ],
+  "events": [
+    {
+      "id": 1,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "1号",
+      "role": "狼人",
+      "category": "skill",
+      "action": "间谍窃取",
+      "target": "1号",
+      "reason": "随便窃取一个，先隐藏自己",
+      "raw": "{\"target\": \"1号\", \"kill_strategy\": \"随便窃取一个，先隐藏自己\", \"team_coordination\": \"无\"}",
+      "metadata": {
+        "target": "1号",
+        "kill_strategy": "随便窃取一个，先隐藏自己",
+        "team_coordination": "无"
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 12
+      }
+    },
+    {
+      "id": 2,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "2号",
+      "role": "预言家",
+      "category": "skill",
+      "action": "HR总监背调",
+      "target": "2号",
+      "reason": "我想先确认自己是不是好人",
+      "raw": "{\"target\": \"2号\", \"check_reason\": \"我想先确认自己是不是好人\", \"priority_level\": 10}",
+      "metadata": {
+        "target": "2号",
+        "check_reason": "我想先确认自己是不是好人",
+        "priority_level": 10
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 12
+      }
+    },
+    {
+      "id": 3,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "3号",
+      "role": "女巫",
+      "category": "skill",
+      "action": "CEO辞退",
+      "target": "5号",
+      "reason": "感觉他话多",
+      "raw": "{\"use_antidote\": false, \"use_poison\": true, \"target_name\": \"5号\", \"action_reason\": \"感觉他话多\"}",
+      "metadata": {
+        "use_antidote": false,
+        "use_poison": true,
+        "target_name": "5号",
+        "action_reason": "感觉他话多"
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 5
+      }
+    },
+    {
+      "id": 4,
+      "round": 1,
+      "phase": "夜晚",
+      "player": "4号",
+      "role": "猎人",
+      "category": "skill",
+      "action": "法务总监诉讼",
+      "target": "6号",
+      "reason": "盲狙一下",
+      "raw": "{\"shoot\": true, \"target\": \"6号\", \"shoot_reason\": \"盲狙一下\"}",
+      "metadata": {
+        "shoot": true,
+        "target": "6号",
+        "shoot_reason": "盲狙一下"
+      },
+      "score": 0.0,
+      "metrics": {
+        "reason_len": 4
+      }
+    },
+    {
+      "id": 5,
+      "round": 1,
+      "phase": "白天讨论",
+      "player": "5号",
+      "role": "村民",
+      "category": "speech",
+      "action": "公开发言",
+      "target": null,
+      "reason": "我觉得1号像好人。",
+      "raw": "我觉得1号像好人。",
+      "metadata": {},
+      "score": 28.0,
+      "metrics": {
+        "length": 9,
+        "evidence_hits": 0,
+        "hedge_hits": 0
+      }
+    },
+    {
+      "id": 6,
+      "round": 1,
+      "phase": "白天讨论",
+      "player": "6号",
+      "role": "村民",
+      "category": "speech",
+      "action": "公开发言",
+      "target": null,
+      "reason": "随便吧。",
+      "raw": "随便吧。",
+      "metadata": {},
+      "score": 22.333333333333336,
+      "metrics": {
+        "length": 4,
+        "evidence_hits": 0,
+        "hedge_hits": 1
+      }
+    },
+    {
+      "id": 7,
+      "round": 1,
+      "phase": "白天讨论",
+      "player": "2号",
+      "role": "预言家",
+      "category": "vote",
+      "action": "投票",
+      "target": "3号",
+      "reason": "没有证据，感觉像间谍",
+      "raw": "{\"vote\": \"3号\", \"reason\": \"没有证据，感觉像间谍\", \"suspicion_level\": 5}",
+      "metadata": {
+        "vote": "3号",
+        "reason": "没有证据，感觉像间谍",
+        "suspicion_level": 5
+      },
+      "score": 32.0,
+      "metrics": {
+        "reason_len": 10,
+        "suspicion_level": 5.0
+      }
+    },
+    {
+      "id": 8,
+      "round": 1,
+      "phase": "白天讨论",
+      "player": "5号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "6号",
+      "reason": "他沉默",
+      "raw": "{\"vote\": \"6号\", \"reason\": \"他沉默\", \"suspicion_level\": 4}",
+      "metadata": {
+        "vote": "6号",
+        "reason": "他沉默",
+        "suspicion_level": 4
+      },
+      "score": 8.5,
+      "metrics": {
+        "reason_len": 3,
+        "suspicion_level": 4.0
+      }
+    },
+    {
+      "id": 9,
+      "round": 1,
+      "phase": "白天讨论",
+      "player": "6号",
+      "role": "村民",
+      "category": "vote",
+      "action": "投票",
+      "target": "5号",
+      "reason": "他说我沉默",
+      "raw": "{\"vote\": \"5号\", \"reason\": \"他说我沉默\", \"suspicion_level\": 4}",
+      "metadata": {
+        "vote": "5号",
+        "reason": "他说我沉默",
+        "suspicion_level": 4
+      },
+      "score": 9.5,
+      "metrics": {
+        "reason_len": 5,
+        "suspicion_level": 4.0
+      }
+    }
+  ],
+  "source_file": "demo_bad_case"
+}

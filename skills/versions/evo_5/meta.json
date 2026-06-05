@@ -1,0 +1,15 @@
+{
+  "version": "evo_5",
+  "generated_at": "2026-06-05T01:47:11",
+  "source_report": "E:\\Three-Kingdoms-Multi-Agent-Werewolf-main\\reports\\evaluation_report_20260604_031829_427656.json",
+  "mode": "template",
+  "roles": [
+    "普通员工",
+    "CEO",
+    "法务总监",
+    "HR总监",
+    "安保主管",
+    "间谍"
+  ],
+  "granularity": "role_x_stage_x_event_type"
+}

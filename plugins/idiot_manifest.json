@@ -1,0 +1,12 @@
+{
+    "role_name": "白痴",
+    "description": "呆萌实习生",
+    "ability": "被投票出局时可以翻牌免死，但此后不再有投票权",
+    "win_condition": "揪出所有间谍，完成组织净化",
+    "team": "公司阵营",
+    "skill": {
+        "class_path": null,
+        "description": "翻牌免死：被投票出局时亮明身份，免于淘汰但失去投票权"
+    },
+    "prompt_file": "idiot.txt"
+}
