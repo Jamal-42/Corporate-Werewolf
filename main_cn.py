@@ -9,6 +9,7 @@ import logging
 import os
 import random
 import sys
+import time
 from datetime import datetime
 from typing import List, Dict, Optional, Any
 
@@ -49,9 +50,50 @@ from game_logger import JSONGameLogger
 from skills import init_skills
 from skills.registry import get_global_registry
 from context_manager import ContextManager
-from model_config import create_model, validate_model_configs, get_config_summary
+from model_config import create_model as _create_model_raw, validate_model_configs, get_config_summary
 from logging_config import setup_logging, setup_tracing, get_logger
 from skills_agent.dispatcher import SkillsDispatcher
+
+
+def _extract_reasoning(meta: Optional[Dict[str, Any]]) -> Optional[List[str]]:
+    """从LLM结构化输出中提取推理链路"""
+    if not meta:
+        return None
+    if meta.get("reasoning_steps"):
+        return meta["reasoning_steps"]
+    parts = []
+    for key in ("kill_strategy", "check_reason", "guard_reason", "reason", "shoot_reason", "save_reason", "poison_reason", "team_coordination"):
+        val = meta.get(key)
+        if val:
+            parts.append(val)
+    return parts if parts else None
+
+
+def create_model(seat_num: int):
+    """创建模型并注入 token 累计跟踪"""
+    model = _create_model_raw(seat_num)
+    model._total_input_tokens = 0
+    model._total_output_tokens = 0
+    original_call = model.__call__
+
+    async def _wrap_stream(gen):
+        async for chunk in gen:
+            if hasattr(chunk, 'usage') and chunk.usage:
+                model._total_input_tokens += getattr(chunk.usage, 'input_tokens', 0) or 0
+                model._total_output_tokens += getattr(chunk.usage, 'output_tokens', 0) or 0
+            yield chunk
+
+    async def tracked_call(*args, **kwargs):
+        result = await original_call(*args, **kwargs)
+        if hasattr(result, '__aiter__'):
+            return _wrap_stream(result)
+        if hasattr(result, 'usage') and result.usage:
+            model._total_input_tokens += getattr(result.usage, 'input_tokens', 0) or 0
+            model._total_output_tokens += getattr(result.usage, 'output_tokens', 0) or 0
+        return result
+
+    model.__call__ = tracked_call
+    return model
 
 
 class OfficeWerewolfGame:
@@ -130,6 +172,37 @@ class OfficeWerewolfGame:
     def alive_player_names(self) -> list[str]:
         """存活玩家名列表（避免反复写 [p.name for p in self.alive_players]）"""
         return [p.name for p in self.alive_players]
+
+    async def _broadcast_to_all(self, content: str, phase: str = "narration") -> Msg:
+        """广播公告给所有存活玩家并记录到 JSONL"""
+        msg = await self.moderator.announce(content)
+        for agent in self.alive_players:
+            if getattr(agent, '_is_human', False):
+                await agent.observe(msg, _skip_jsonl=True)
+        if self.logger:
+            self.logger.log_model_call(
+                player="旁白",
+                role="主持人",
+                phase=phase,
+                model_name="system",
+                prompt_version="",
+                seat="旁白",
+                output_content={"content": content},
+            )
+        return msg
+
+    def _narrate(self, content: str, phase: str = "night") -> None:
+        """记录夜晚旁白到 JSONL（上帝视角可见），不广播给玩家"""
+        if self.logger:
+            self.logger.log_model_call(
+                player="旁白",
+                role="主持人",
+                phase=phase,
+                model_name="system",
+                prompt_version="",
+                seat="旁白",
+                output_content={"content": content},
+            )
 
     def _build_game_state(self, seat: int, **overrides) -> dict[str, Any]:
         """构建技能游戏状态字典的通用基础
@@ -310,7 +383,13 @@ class OfficeWerewolfGame:
         rules_msg = await self.moderator.announce(game_rules)
         for agent in self.alive_players:
             await agent.observe(rules_msg)
-        
+
+        opening = (
+            "欢迎大家来到职场狼人杀博弈！身份已发放，请大家确认身份后闭眼扣牌，"
+            "不许交流、不许偷看。游戏正式开始——天黑请闭眼。"
+        )
+        await self._broadcast_to_all(opening, phase="opening")
+
         self._game_log.info(f"游戏设置完成，共{len(self.alive_players)}名玩家")
 
         if self.logger:
@@ -336,23 +415,24 @@ class OfficeWerewolfGame:
                 character_role_map=character_role_map,
             )
 
-    def _log_agent_response(self, agent, response_msg: Msg, phase: str = "unknown") -> None:
+    def _log_agent_response(self, agent, response_msg: Msg, phase: str = "unknown", latency_ms: Optional[float] = None, input_tokens: Optional[int] = None, output_tokens: Optional[int] = None) -> None:
         """记录单个Agent的响应到日志
-        
+
         Args:
             agent: 发言的Agent
             response_msg: Agent返回的消息对象
             phase: 当前阶段
+            latency_ms: 本次调用耗时(毫秒)
         """
         if not response_msg:
             return
-            
+
         seat = self.get_seat_num(agent)
         model_info = self.seat_model_info.get(seat, {})
-        
+
         content = getattr(response_msg, 'content', None)
         metadata = getattr(response_msg, 'metadata', None)
-        
+
         if content and isinstance(content, str):
             self.moderator.log_player_speech(
                 player_name=agent.name,
@@ -360,7 +440,7 @@ class OfficeWerewolfGame:
                 round_num=self.round_num,
                 phase=phase,
             )
-        
+
         if self.logger and hasattr(self.logger, 'save_prompt'):
             messages = extract_agent_messages(agent)
 
@@ -374,7 +454,7 @@ class OfficeWerewolfGame:
                 )
             except Exception as e:
                 self._diag_log.warning(f"保存prompt失败: {e}")
-        
+
         if self.logger:
             output_dict = {
                 "content": content if isinstance(content, str) else str(content) if content else None,
@@ -388,33 +468,81 @@ class OfficeWerewolfGame:
                 prompt_version=self.prompt_manager.version,
                 seat=agent.name,
                 output_content=output_dict,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                latency_ms=latency_ms,
             )
 
     async def _logged_sequential_pipeline(self, agents, msg=None, phase: str = "discussion"):
         """带日志记录的顺序发言pipeline
-        
+
         sequential_pipeline 返回单个 Msg（最后一个 agent 的输出）
         需要在每个 agent 发言后立即记录
         """
         last_result = None
         for agent in agents:
+            # 轮到真人前等待，根据前一条发言长度动态延迟（TTS 大约每秒播4-5个汉字）
+            if getattr(agent, '_is_human', False) and last_result is not None:
+                prev_len = len(getattr(last_result, 'content', '') or '')
+                wait_secs = max(5, min(30, prev_len // 4))
+                await asyncio.sleep(wait_secs)
+            model = getattr(agent, 'model', None)
+            pre_input = getattr(model, '_total_input_tokens', 0) if model else 0
+            pre_output = getattr(model, '_total_output_tokens', 0) if model else 0
+            t0 = time.time()
             if msg:
                 result = await agent(msg=msg)
             else:
                 result = await agent()
-            self._log_agent_response(agent, result, phase=phase)
+            latency_ms = round((time.time() - t0) * 1000)
+            # 后处理：截断过长内容或修复英文输出
+            if result and hasattr(result, 'content') and isinstance(result.content, str):
+                content = result.content
+                if len(content) > 500:
+                    result.content = content[:500]
+                    self._diag_log.warning(f"{agent.name} 输出过长({len(content)}字)，已截断")
+            inp_diff = (getattr(model, '_total_input_tokens', 0) - pre_input) if model else 0
+            out_diff = (getattr(model, '_total_output_tokens', 0) - pre_output) if model else 0
+            self._log_agent_response(agent, result, phase=phase, latency_ms=latency_ms,
+                                     input_tokens=inp_diff if inp_diff > 0 else None,
+                                     output_tokens=out_diff if out_diff > 0 else None)
             last_result = result
         return last_result
 
     async def _logged_fanout_pipeline(self, agents, msg=None, structured_model=None, phase: str = "vote", enable_gather: bool = False) -> List[Msg]:
-        """带日志记录的并行发言pipeline
-        
-        fanout_pipeline 返回 List[Msg]
-        """
-        results = await fanout_pipeline(agents, msg=msg, structured_model=structured_model, enable_gather=enable_gather)
-        if results:
-            for agent, result in zip(agents, results):
-                self._log_agent_response(agent, result, phase=phase)
+        """带日志记录的并行发言pipeline，每个Agent完成后立刻写入日志"""
+        from copy import deepcopy
+
+        async def _call_and_log(agent, idx):
+            model = getattr(agent, 'model', None)
+            pre_input = getattr(model, '_total_input_tokens', 0) if model else 0
+            pre_output = getattr(model, '_total_output_tokens', 0) if model else 0
+            t0 = time.time()
+            if structured_model:
+                result = await agent(deepcopy(msg), structured_model=structured_model)
+            else:
+                result = await agent(deepcopy(msg))
+            latency_ms = round((time.time() - t0) * 1000)
+            inp_diff = (getattr(model, '_total_input_tokens', 0) - pre_input) if model else 0
+            out_diff = (getattr(model, '_total_output_tokens', 0) - pre_output) if model else 0
+            self._log_agent_response(agent, result, phase=phase, latency_ms=latency_ms,
+                                     input_tokens=inp_diff if inp_diff > 0 else None,
+                                     output_tokens=out_diff if out_diff > 0 else None)
+            return idx, result
+
+        results = [None] * len(agents)
+        if enable_gather:
+            tasks = [
+                asyncio.ensure_future(_call_and_log(agent, i))
+                for i, agent in enumerate(agents)
+            ]
+            for coro in asyncio.as_completed(tasks):
+                idx, result = await coro
+                results[idx] = result
+        else:
+            for i, agent in enumerate(agents):
+                _, result = await _call_and_log(agent, i)
+                results[i] = result
         return results
 
     async def _safe_agent_call(self, agent, structured_model=None, max_retries=MAX_RETRIES, phase="unknown"):
@@ -454,14 +582,19 @@ class OfficeWerewolfGame:
         
         last_output_content = None
         last_metadata = None
-        
+
         for attempt in range(max_retries):
             try:
+                t0 = time.time()
+                model = getattr(agent, 'model', None)
+                pre_input = getattr(model, '_total_input_tokens', 0) if model else 0
+                pre_output = getattr(model, '_total_output_tokens', 0) if model else 0
                 if structured_model:
                     result = await agent(structured_model=structured_model)
                 else:
                     result = await agent()
-                
+                call_latency_ms = round((time.time() - t0) * 1000)
+
                 if result:
                     if hasattr(result, 'content') and result.content:
                         content = result.content
@@ -471,16 +604,24 @@ class OfficeWerewolfGame:
                                 await asyncio.sleep(2 ** attempt)
                                 continue
                             return None
-                    
+
                     last_output_content = getattr(result, 'content', None)
                     if hasattr(result, 'metadata') and result.metadata:
                         last_metadata = result.metadata
-                    
+
                     if self.logger:
                         output_dict = {
                             "content": last_output_content if isinstance(last_output_content, str) else str(last_output_content) if last_output_content else None,
                             "metadata": last_metadata,
                         }
+                        input_tokens = None
+                        output_tokens = None
+                        model = getattr(agent, 'model', None)
+                        if model and hasattr(model, '_total_input_tokens'):
+                            inp_diff = getattr(model, '_total_input_tokens', 0) - pre_input
+                            out_diff = getattr(model, '_total_output_tokens', 0) - pre_output
+                            input_tokens = inp_diff if inp_diff > 0 else None
+                            output_tokens = out_diff if out_diff > 0 else None
                         self.logger.log_model_call(
                             player=f"{seat}号",
                             role=self.get_role_by_seat(seat),
@@ -489,6 +630,9 @@ class OfficeWerewolfGame:
                             prompt_version=self.prompt_manager.version,
                             seat=agent.name,
                             output_content=output_dict,
+                            input_tokens=input_tokens,
+                            output_tokens=output_tokens,
+                            latency_ms=call_latency_ms,
                         )
                         
                         if last_output_content and isinstance(last_output_content, str):
@@ -536,6 +680,7 @@ class OfficeWerewolfGame:
                     wolf, "werewolf", round_num, role, seat)
 
         await self.moderator.announce("间谍请睁眼，今晚可以自由协商窃取目标...")
+        self._narrate("间谍请睁眼，今晚可以自由协商窃取目标...", phase="werewolf")
 
         wolf_names = ", ".join([w.name for w in self.werewolves])
         
@@ -545,24 +690,30 @@ class OfficeWerewolfGame:
                 f"【第一夜·身份确认】你们的间谍队友是：{wolf_names}。\n"
                 f"这是游戏开始的第一夜，没有任何发言历史、投票记录或淘汰信息。\n"
                 f"请先讨论战术安排：谁负责冲锋（积极发言带节奏）、谁负责倒钩（假装好人跟风）、"
-                f"谁负责深潜（低调苟活），然后再确定窃取目标。"
+                f"谁负责深潜（低调苟活），然后再确定窃取目标。\n"
+                f"【注意】请用中文简短发言（2-3句话），直接说你的想法，不要用英文，不要写分析报告。"
             )
         else:
-            announcement_content = f"间谍们，请讨论今晚的目标。存活员工：{format_player_list(self.alive_players)}"
+            announcement_content = (
+                f"间谍们，请讨论今晚的目标。存活员工：{format_player_list(self.alive_players)}\n"
+                f"【注意】请用中文简短发言（2-3句话），直接说你的想法。"
+            )
 
         async with MsgHub(
             self.werewolves,
             enable_auto_broadcast=True,
             announcement=await self.moderator.announce(announcement_content),
         ) as werewolves_hub:
-            discussion_rounds = 2 if len(self.werewolves) > 1 else 1
-            
+            # 有真人参与时只讨论1轮（避免重复输入），纯AI讨论2轮
+            has_human_wolf = any(getattr(w, '_is_human', False) for w in self.werewolves)
+            discussion_rounds = 1 if has_human_wolf else (2 if len(self.werewolves) > 1 else 1)
+
             for round_idx in range(discussion_rounds):
                 if len(self.werewolves) > 1:
                     round_prompt = (
-                        f"第{round_idx + 1}轮讨论：" 
-                        if round_num > 1 
-                        else f"第{round_idx + 1}轮讨论（战术安排阶段）：请依次发言，讨论战术分工和窃取目标。"
+                        f"第{round_idx + 1}轮讨论，请用中文简短发言讨论窃取目标："
+                        if round_num > 1
+                        else f"第{round_idx + 1}轮讨论（战术安排阶段）：请用中文依次简短发言，讨论战术分工和窃取目标。"
                     )
                     await self._logged_sequential_pipeline(
                         self.werewolves,
@@ -571,7 +722,7 @@ class OfficeWerewolfGame:
                     )
                 else:
                     single_result = await self.werewolves[0](
-                        msg=await self.moderator.announce("请发表你的意见")
+                        msg=await self.moderator.announce("请用中文发表你的意见")
                     )
                     self._log_agent_response(self.werewolves[0], single_result, phase="werewolf_discussion")
 
@@ -608,22 +759,38 @@ class OfficeWerewolfGame:
                         votes[self.werewolves[i].name] = random.choice(valid_targets)
 
             killed_player, vote_count = majority_vote_cn(votes)
-            
+
             if not killed_player and votes:
                 all_targets = [t for t in votes.values() if t]
                 if all_targets:
                     killed_player = random.choice(all_targets)
                     self._diag_log.warning(f"间谍投票分散，随机选择目标: {killed_player}")
-            
+
             if not killed_player:
                 non_wolf_targets = [p.name for p in self.alive_players if p not in self.werewolves]
                 if non_wolf_targets:
                     killed_player = random.choice(non_wolf_targets)
                     self._diag_log.warning(f"间谍无有效投票，随机选择目标: {killed_player}")
 
-            if self.logger and killed_player:
+            # === 间谍投票协议确认 ===
+            valid_votes = {k: v for k, v in votes.items() if v}
+            if len(valid_votes) > 1:
+                vote_targets = list(valid_votes.values())
+                consensus = all(t == vote_targets[0] for t in vote_targets)
+                deviators = [name for name, target in valid_votes.items() if target != killed_player]
+                protocol_msg = (
+                    f"【协议确认】本轮窃取目标：{killed_player}。"
+                    + (f"全员一致。" if consensus else f"存在分歧：{', '.join(deviators)}投了不同目标。")
+                )
                 for wolf in self.werewolves:
+                    await wolf.observe(Msg(name="系统", content=protocol_msg, role="system"))
+                if self.logger:
+                    self._narrate(protocol_msg, phase="werewolf")
+
+            if self.logger and killed_player:
+                for i, wolf in enumerate(self.werewolves):
                     seat = self.get_seat_num(wolf)
+                    wolf_meta = safe_parse_metadata(kill_votes[i]) if i < len(kill_votes) else None
                     self.logger.log_decision(
                         round_num=round_num,
                         phase="werewolf",
@@ -631,9 +798,9 @@ class OfficeWerewolfGame:
                         role="狼人",
                         action="间谍窃取",
                         target=votes.get(wolf.name),
-                        reasoning_steps=None,
-                        key_evidence=None,
-                        full_output=None,
+                        reasoning_steps=_extract_reasoning(wolf_meta),
+                        key_evidence=wolf_meta.get("kill_strategy") if wolf_meta else None,
+                        full_output=wolf_meta,
                         seat=f"{seat}号",
                     )
             return killed_player
@@ -644,6 +811,7 @@ class OfficeWerewolfGame:
             return
 
         seer_agent = self.seer[0]
+        meta = None
 
         # Skills阶段注入：预言家
         if self.skills_dispatcher:
@@ -653,6 +821,13 @@ class OfficeWerewolfGame:
                 seer_agent, "seer", self.round_num, role, seat)
 
         await self.moderator.announce("HR总监请睁眼，选择要做背景调查的员工...")
+        self._narrate("HR总监请睁眼，选择要做背景调查的员工...", phase="seer")
+
+        # 真人预言家：告知阶段信息
+        if getattr(seer_agent, '_is_human', False):
+            alive_list = format_player_list(self.alive_players)
+            hint = f"HR总监请睁眼，请选择今晚要背调的员工。存活员工：{alive_list}"
+            await seer_agent.observe(await self.moderator.announce(hint))
 
         skill = self.skill_registry.get_skill("预言家")
         seat = self.get_seat_num(seer_agent)
@@ -708,8 +883,21 @@ class OfficeWerewolfGame:
                 self._diag_log.warning(f"预言家重试后仍无效，随机选择: {target_name}")
 
         target_role = self.roles.get(target_name, "村民")
+        seer_seat = self.get_seat_num(seer_agent)
+        seer_speech = f"我决定对{target_name}进行背景调查。"
+        if self.logger:
+            self.logger.log_model_call(
+                player=f"{seer_seat}号",
+                role="预言家",
+                phase="seer",
+                model_name="system",
+                prompt_version="",
+                seat=seer_agent.name,
+                output_content={"content": seer_speech},
+            )
         result_msg = f"背调结果：{target_name}是{'间谍' if target_role == '狼人' else '清白员工'}"
         await seer_agent.observe(await self.moderator.announce(result_msg))
+        self._narrate(result_msg, phase="seer")
 
         self.context_manager.add_key_event(self.round_num, "seer_result", result_msg)
 
@@ -721,9 +909,9 @@ class OfficeWerewolfGame:
                 role="预言家",
                 action="HR背调",
                 target=target_name,
-                reasoning_steps=None,
+                reasoning_steps=_extract_reasoning(meta),
                 key_evidence=f"背调结果：{target_role}",
-                full_output=None,
+                full_output=meta,
                 seat=f"{seat}号",
             )
 
@@ -733,6 +921,7 @@ class OfficeWerewolfGame:
             return None
 
         guard_agent = self.guard[0]
+        guard_meta = None
 
         # Skills阶段注入：守护者
         if self.skills_dispatcher:
@@ -742,6 +931,15 @@ class OfficeWerewolfGame:
                 guard_agent, "guard", round_num, role, seat)
 
         await self.moderator.announce("安保主管请睁眼，选择今晚要加密保护的员工...")
+        self._narrate("安保主管请睁眼，选择今晚要加密保护的员工...", phase="guard")
+
+        # 真人守护者：告知阶段信息
+        if getattr(guard_agent, '_is_human', False):
+            guardable = [p for p in self.alive_players if p.name != self.last_guarded]
+            guard_list = format_player_list(guardable)
+            last_info = f"（昨晚保护了{self.last_guarded}，不能连续保护同一人）" if self.last_guarded else ""
+            hint = f"安保主管请睁眼，请选择今晚要加密保护的员工。{last_info}可选目标：{guard_list}"
+            await guard_agent.observe(await self.moderator.announce(hint))
 
         skill = self.skill_registry.get_skill("守护者")
         seat = self.get_seat_num(guard_agent)
@@ -813,9 +1011,22 @@ class OfficeWerewolfGame:
                     return None
 
         self.last_guarded = target_name
+        guard_seat = self.get_seat_num(guard_agent)
+        guard_speech = f"我今晚保护{target_name}。"
+        if self.logger:
+            self.logger.log_model_call(
+                player=f"{guard_seat}号",
+                role="守护者",
+                phase="guard",
+                model_name="system",
+                prompt_version="",
+                seat=guard_agent.name,
+                output_content={"content": guard_speech},
+            )
         await guard_agent.observe(
             await self.moderator.announce(f"你今晚保护了{target_name}的数据权限")
         )
+        self._narrate(f"安保主管今晚保护了{target_name}的数据权限", phase="guard")
         if self.logger:
             seat = self.get_seat_num(guard_agent)
             self.logger.log_decision(
@@ -825,9 +1036,9 @@ class OfficeWerewolfGame:
                 role="守护者",
                 action="加密保护",
                 target=target_name,
-                reasoning_steps=None,
-                key_evidence=None,
-                full_output=None,
+                reasoning_steps=_extract_reasoning(guard_meta),
+                key_evidence=guard_meta.get("guard_reason") if guard_meta else None,
+                full_output=guard_meta,
                 seat=f"{seat}号",
             )
         return target_name
@@ -846,6 +1057,7 @@ class OfficeWerewolfGame:
             return (None if was_guarded else killed_player), None
 
         witch_agent = self.witch[0]
+        witch_meta = None
 
         # Skills阶段注入：女巫
         if self.skills_dispatcher:
@@ -855,12 +1067,24 @@ class OfficeWerewolfGame:
                 witch_agent, "witch", self.round_num, role, seat)
 
         await self.moderator.announce("CEO请睁眼...")
+        self._narrate("CEO请睁眼...", phase="witch")
+
+        # 真人女巫：先告知阶段信息
+        if getattr(witch_agent, '_is_human', False):
+            potion_status = []
+            if self.witch_has_antidote:
+                potion_status.append("留人offer可用")
+            if self.witch_has_poison:
+                potion_status.append("辞退信可用")
+            hint = f"CEO请睁眼，轮到你决策。当前状态：{'、'.join(potion_status) if potion_status else '已无可用道具'}。"
+            await witch_agent.observe(await self.moderator.announce(hint))
 
         # 同保同挽留规则：女巫始终被告知击杀信息（即使被安保保护）
         death_info = f"今晚{killed_player}被间谍窃取了信息（即将离职）" if killed_player else "今晚平安无事"
         if was_guarded and killed_player:
             death_info += "（安保主管已加密保护此人，但同保同挽留规则下，仅靠保护或仅靠挽留均不够——需要两者都不作用才能存活）"
         await witch_agent.observe(await self.moderator.announce(death_info))
+        self._narrate(death_info, phase="witch")
 
         skill = self.skill_registry.get_skill("女巫")
         seat = self.get_seat_num(witch_agent)
@@ -885,6 +1109,27 @@ class OfficeWerewolfGame:
         used_potion = False
         guard_save_cancelled = False  # 安保保护是否抵消了击杀
 
+        witch_seat = self.get_seat_num(witch_agent)
+        if result:
+            if result.get("use_antidote") and self.witch_has_antidote:
+                witch_speech = f"我决定签发留人offer，挽留{killed_player}。"
+            elif result.get("use_poison") and self.witch_has_poison and result.get("target_name"):
+                witch_speech = f"我决定签发辞退信，开除{result['target_name']}。"
+            else:
+                witch_speech = "我今晚不使用任何道具。"
+        else:
+            witch_speech = "我今晚不使用任何道具。"
+        if self.logger:
+            self.logger.log_model_call(
+                player=f"{witch_seat}号",
+                role="女巫",
+                phase="witch",
+                model_name="system",
+                prompt_version="",
+                seat=witch_agent.name,
+                output_content={"content": witch_speech},
+            )
+
         if result:
             if result.get("use_antidote") and self.witch_has_antidote and not used_potion:
                 if killed_player:
@@ -904,6 +1149,7 @@ class OfficeWerewolfGame:
                                 f"但同保同挽留规则：安保保护与CEO挽留同时生效，{killed_player}仍然离职！"
                             )
                         )
+                        self._narrate(f"CEO签发了留人offer，但同保同挽留规则下{killed_player}仍然离职", phase="witch")
                     else:
                         # 正常挽留：仅解药生效，目标存活
                         saved_player = killed_player
@@ -912,6 +1158,7 @@ class OfficeWerewolfGame:
                         await witch_agent.observe(
                             await self.moderator.announce(f"你签发了留人offer，{killed_player}被挽留")
                         )
+                        self._narrate(f"CEO签发了留人offer，{killed_player}被挽留", phase="witch")
 
             if result.get("use_poison") and self.witch_has_poison and not used_potion:
                 poisoned_player = result.get("target_name")
@@ -925,6 +1172,7 @@ class OfficeWerewolfGame:
                         await witch_agent.observe(
                             await self.moderator.announce(f"你签发了辞退信，{poisoned_player}被开除")
                         )
+                        self._narrate(f"CEO签发了辞退信，{poisoned_player}被开除", phase="witch")
 
         # 结算 final_killed：综合考虑保护、解药、同保同挽留
         if was_guarded and guard_save_cancelled:
@@ -958,9 +1206,9 @@ class OfficeWerewolfGame:
                 role="女巫",
                 action=action,
                 target=target,
-                reasoning_steps=None,
-                key_evidence=None,
-                full_output=None,
+                reasoning_steps=_extract_reasoning(witch_meta),
+                key_evidence=witch_meta.get("reason") if witch_meta else None,
+                full_output=witch_meta,
                 seat=f"{seat}号",
             )
 
@@ -979,6 +1227,7 @@ class OfficeWerewolfGame:
 
         if is_poisoned:
             await self.moderator.announce(f"{hunter_agent.name}被辞退信开除，无法发起诉讼。")
+            self._narrate(f"{hunter_agent.name}被辞退信开除，无法发起诉讼。", phase="hunter")
             if self.logger:
                 self.logger.log_decision(
                     round_num=self.round_num,
@@ -987,7 +1236,7 @@ class OfficeWerewolfGame:
                     role="猎人",
                     action="法务诉讼",
                     target=None,
-                    reasoning_steps=None,
+                    reasoning_steps=["被辞退信开除，技能被封锁"],
                     key_evidence="被辞退信开除，无法发起诉讼",
                     full_output=None,
                     seat=f"{seat}号",
@@ -999,6 +1248,7 @@ class OfficeWerewolfGame:
             f"{hunter_agent.name}是法务总监，出局时可以发起诉讼带走一名员工..."
         )
         await self.moderator.announce(hunter_public_msg)
+        self._narrate(hunter_public_msg, phase="hunter")
         # 让所有存活玩家看到此公告
         public_msg = Msg(name="游戏主持人", content=hunter_public_msg, role="system")
         for agent in self.alive_players:
@@ -1040,7 +1290,7 @@ class OfficeWerewolfGame:
                     role="猎人",
                     action="法务诉讼",
                     target=None,
-                    reasoning_steps=None,
+                    reasoning_steps=_extract_reasoning(hunter_meta) or ["选择不发起诉讼"],
                     key_evidence=hunter_meta.get("shoot_reason") if hunter_meta else "选择不发起诉讼",
                     full_output=hunter_meta,
                     seat=f"{seat}号",
@@ -1065,7 +1315,7 @@ class OfficeWerewolfGame:
                 role="猎人",
                 action="法务诉讼",
                 target=target,
-                reasoning_steps=None,
+                reasoning_steps=_extract_reasoning(hunter_meta),
                 key_evidence=hunter_meta.get("shoot_reason") if hunter_meta else None,
                 full_output=hunter_meta,
                 seat=f"{seat}号",
@@ -1076,6 +1326,25 @@ class OfficeWerewolfGame:
                 source_seat=f"{seat}号",
             )
         return target
+
+    async def _last_words(self, player_name: str, round_num: int):
+        """被淘汰玩家发表离职感言（遗言）"""
+        agent = next((p for p in self.alive_players if p.name == player_name), None)
+        if not agent:
+            return
+
+        await self._broadcast_to_all(
+            f"{player_name}被投票淘汰，请发表离职感言。", phase="last_words"
+        )
+
+        try:
+            last_words_msg = await self._safe_agent_call(
+                agent, phase="last_words"
+            )
+            if last_words_msg:
+                self._log_agent_response(agent, last_words_msg, phase="last_words")
+        except Exception:
+            pass
 
     def update_alive_players(self, dead_players: List[str]):
         """更新存活玩家列表"""
@@ -1090,7 +1359,7 @@ class OfficeWerewolfGame:
                 self.guard = [p for p in self.guard if p.name != dead_name]
 
     async def day_phase(self, round_num: int) -> Optional[str]:
-        """白天阶段（例会讨论+归票发言+投票）"""
+        """白天阶段（讨论+投票，平票则加赛一轮）"""
         # Skills阶段注入：所有存活玩家
         if self.skills_dispatcher:
             for agent in self.alive_players:
@@ -1099,7 +1368,10 @@ class OfficeWerewolfGame:
                 await self.skills_dispatcher.inject_phase_skills(
                     agent, "day_discussion", round_num, role, seat)
 
-        await self.moderator.day_announcement(round_num)
+        await self._broadcast_to_all(
+            f"第{round_num}天天亮了，请大家睁眼，例会开始。",
+            phase="day"
+        )
 
         async with MsgHub(
             self.alive_players,
@@ -1110,28 +1382,25 @@ class OfficeWerewolfGame:
         ) as all_hub:
             await self._logged_sequential_pipeline(self.alive_players, phase="day_discussion")
 
-            await self.moderator.announce("归票发言开始，请各位明确投票方向和理由。")
-            await self._logged_sequential_pipeline(self.alive_players, phase="day_vote_discussion")
-
             all_hub.set_auto_broadcast(False)
-            vote_msgs = await self._logged_fanout_pipeline(
-                self.alive_players,
-                await self.moderator.announce("请投票选择要淘汰的员工"),
-                structured_model=get_vote_model_cn(self.alive_players),
-                phase="day_vote",
-                enable_gather=False,
+            voted_out, vote_count, votes, vote_msgs = await self._day_vote(
+                round_num, all_hub)
+
+            if voted_out == "平票无人出局":
+                all_hub.set_auto_broadcast(True)
+                await self.moderator.announce("平票，进入归票发言环节，请各位明确投票方向和理由。")
+                await self._logged_sequential_pipeline(self.alive_players, phase="day_vote_discussion")
+
+                all_hub.set_auto_broadcast(False)
+                voted_out, vote_count, votes, vote_msgs = await self._day_vote(
+                    round_num, all_hub)
+                if voted_out == "平票无人出局":
+                    await self.moderator.announce("再次平票，本轮无人出局。")
+
+            await self._broadcast_to_all(
+                f"投票结果：{voted_out}以{vote_count}票被全员投出，领大礼包走人。",
+                phase="vote_result"
             )
-
-            votes = {}
-            for i, vote_msg in enumerate(vote_msgs):
-                meta = safe_parse_metadata(vote_msg)
-                if meta:
-                    votes[self.alive_players[i].name] = meta.get("vote")
-                else:
-                    votes[self.alive_players[i].name] = None
-
-            voted_out, vote_count = majority_vote_cn(votes)
-            await self.moderator.vote_result_announcement(voted_out, vote_count)
 
             if self.logger:
                 self.logger.log_vote_result(round_num, votes, voted_out, vote_count)
@@ -1145,7 +1414,7 @@ class OfficeWerewolfGame:
                         role=self.get_role_by_seat(seat),
                         action="投票",
                         target=votes.get(player.name),
-                        reasoning_steps=None,
+                        reasoning_steps=_extract_reasoning(meta),
                         key_evidence=meta.get("reason") if meta else None,
                         full_output=meta if meta else None,
                         seat=player.name,
@@ -1156,7 +1425,63 @@ class OfficeWerewolfGame:
                 f"投票结果：{voted_out}以{vote_count}票被投出"
             )
 
-            return voted_out
+            # === 矛盾追踪注入 ===
+            contradictions = []
+            for player in self.alive_players:
+                vote_target = votes.get(player.name)
+                if not vote_target:
+                    continue
+                speech_targets = set()
+                if hasattr(player, 'memory') and player.memory:
+                    memory_content = getattr(player.memory, 'content', [])
+                    for msg in memory_content:
+                        msg_content = getattr(msg, 'content', None)
+                        if not msg_content or not isinstance(msg_content, str):
+                            continue
+                        name_attr = getattr(msg, 'name', '')
+                        if name_attr != player.name:
+                            continue
+                        for keyword in ("怀疑", "投", "淘汰", "出局", "有问题"):
+                            if keyword in msg_content:
+                                for other in self.alive_players:
+                                    if other.name != player.name and other.name in msg_content:
+                                        speech_targets.add(other.name)
+                                break
+                if speech_targets and vote_target not in speech_targets:
+                    seat = self.get_seat_num(player)
+                    contradictions.append(
+                        f"{seat}号发言中针对{'、'.join(speech_targets)}，但实际投了{vote_target}"
+                    )
+
+            if contradictions:
+                contradiction_summary = "【矛盾追踪】" + "；".join(contradictions[:5]) + "。"
+                for player in self.alive_players:
+                    await player.observe(Msg(name="系统", content=contradiction_summary, role="system"))
+                if self.logger:
+                    self._narrate(contradiction_summary, phase="day")
+
+            return voted_out if voted_out != "平票无人出局" else None
+
+    async def _day_vote(self, round_num: int, all_hub) -> tuple:
+        """执行一次投票，返回 (voted_out, vote_count, votes, vote_msgs)"""
+        vote_msgs = await self._logged_fanout_pipeline(
+            self.alive_players,
+            await self.moderator.announce("请投票选择要淘汰的员工"),
+            structured_model=get_vote_model_cn(self.alive_players),
+            phase="day_vote",
+            enable_gather=False,
+        )
+
+        votes = {}
+        for i, vote_msg in enumerate(vote_msgs):
+            meta = safe_parse_metadata(vote_msg)
+            if meta:
+                votes[self.alive_players[i].name] = meta.get("vote")
+            else:
+                votes[self.alive_players[i].name] = None
+
+        voted_out, vote_count = majority_vote_cn(votes)
+        return voted_out, vote_count, votes, vote_msgs
 
     def _extract_identity_claims_from_memory(self) -> Dict[str, List[str]]:
         """从玩家发言记录中提取身份声明
@@ -1213,7 +1538,9 @@ class OfficeWerewolfGame:
                 self._game_log.info(f"\n=== 第{round_num}轮夜晚 ===")
                 if self.logger:
                     self.logger.log_night_start(round_num)
-                await self.moderator.night_announcement(round_num)
+                await self._broadcast_to_all(
+                    f"第{round_num}夜降临，天黑请闭眼...", phase="night"
+                )
 
                 # 间谍窃取
                 killed_player = await self.werewolf_phase(round_num)
@@ -1235,7 +1562,13 @@ class OfficeWerewolfGame:
                 # 结算夜晚死亡
                 night_deaths = [p for p in [final_killed, poisoned_player] if p]
                 self.update_alive_players(night_deaths)
-                await self.moderator.death_announcement(night_deaths)
+                if not night_deaths:
+                    await self._broadcast_to_all("昨夜平安无事，无人领大礼包。", phase="night_result")
+                else:
+                    death_names = "、".join(night_deaths)
+                    await self._broadcast_to_all(
+                        f"昨夜，{death_names}领了大礼包，正式离职。", phase="night_result"
+                    )
 
                 for dead in night_deaths:
                     self.context_manager.add_key_event(round_num, "death", f"{dead}夜间离职")
@@ -1257,8 +1590,8 @@ class OfficeWerewolfGame:
                     self.logger.log_state_snapshot(
                         round_num, "night_end",
                         [p.name for p in self.alive_players],
-                        [self.seat_characters.get(p.name, p.name) for p in self.alive_players],
                         self.witch_has_antidote, self.witch_has_poison, self.last_guarded,
+                        alive_characters=[self.seat_characters.get(p.name, p.name) for p in self.alive_players],
                     )
 
                 # 夜晚离职的法务总监判断
@@ -1282,7 +1615,14 @@ class OfficeWerewolfGame:
                 # 白天阶段
                 if self.logger:
                     self.logger.log_day_start(round_num)
+                await self._broadcast_to_all(
+                    f"第{round_num}天天亮了，请大家睁眼...", phase="day"
+                )
                 voted_out = await self.day_phase(round_num)
+
+                # 离职感言（被淘汰者发表遗言）
+                if voted_out and voted_out != "平票无人出局":
+                    await self._last_words(voted_out, round_num)
 
                 # 法务总监技能（白天投票出局可以发起诉讼）
                 hunter_shot = await self.hunter_phase(voted_out, is_poisoned=False)

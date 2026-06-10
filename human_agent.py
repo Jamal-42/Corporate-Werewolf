@@ -8,6 +8,9 @@ HumanAgent — 真人玩家智能体
 信息隔离：只打印 msg.content（纯文本），绝不打印 msg.metadata（结构化推理字段）。
 """
 import asyncio
+import json
+import os
+from pathlib import Path
 from typing import Optional
 
 from agentscope.agent import AgentBase
@@ -18,6 +21,33 @@ from agentscope.message import Msg
 # ─── 显示分隔符 ────────────────────────────────────────────────
 _SEP = "─" * 50
 _CTX_SEP = "━" * 50
+
+
+def human_input_queue_path(run_id: str, seat_num: int, root: str) -> Path:
+    safe_run_id = "".join(ch for ch in run_id if ch.isalnum() or ch in "_.-")
+    if safe_run_id != run_id:
+        raise ValueError("invalid run id")
+    return Path(root) / f"{safe_run_id}_seat{seat_num}.jsonl"
+
+
+def pop_human_input(path: Path) -> Optional[str]:
+    if not path.exists():
+        return None
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if not lines:
+        return None
+
+    for index, line in enumerate(lines):
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        text = str(payload.get("text") or "").strip()
+        if text:
+            remaining = lines[:index] + lines[index + 1:]
+            path.write_text(("\n".join(remaining) + "\n") if remaining else "", encoding="utf-8")
+            return text
+    return None
 
 
 class HumanAgent(AgentBase):
@@ -32,15 +62,19 @@ class HumanAgent(AgentBase):
         self._is_human = True  # ContextManager / SkillsDispatcher 检查用
 
     # ─── observe ──────────────────────────────────────────────
-    async def observe(self, msg) -> None:
-        """接收消息：存入 memory + 格式化打印给真人（只打印 content）"""
+    async def observe(self, msg, _skip_jsonl: bool = False) -> None:
+        """接收消息：存入 memory + 格式化打印给真人（只打印 content）+ 写入 JSONL 让前端可见"""
         if isinstance(msg, list):
             for m in msg:
                 await self.memory.add(m)
                 self._display_msg(m)
+                if not _skip_jsonl:
+                    self._emit_observe_event(m)
         elif msg is not None:
             await self.memory.add(msg)
             self._display_msg(msg)
+            if not _skip_jsonl:
+                self._emit_observe_event(msg)
 
     # ─── reply ────────────────────────────────────────────────
     async def reply(self, msg=None, structured_model=None) -> Msg:
@@ -74,7 +108,7 @@ class HumanAgent(AgentBase):
         self._display_context()
         print()
         print(f"{'─' * 20} {self.name} 轮到你发言 {'─' * 20}")
-        text = await self._get_input(">>> 请输入你的发言(回车提交): ")
+        text = await self._get_input(f"你是{self.seat_num}号，轮到你自由发言，请输入: ")
         if not text.strip():
             text = "（沉默）"
         return Msg(name=self.name, content=text.strip(), role="assistant")
@@ -91,6 +125,9 @@ class HumanAgent(AgentBase):
         fields = model_class.model_fields
 
         for field_name, field_info in fields.items():
+            if self._should_auto_fill(field_name, field_info):
+                data[field_name] = self._get_auto_fill_value(field_name, field_info)
+                continue
             value = await self._prompt_field(field_name, field_info, model_class)
             data[field_name] = value
 
@@ -131,8 +168,9 @@ class HumanAgent(AgentBase):
         print(hint)
         for i, choice in enumerate(choices, 1):
             print(f"    {i}. {choice}")
+        choices_str = " / ".join(choices)
         while True:
-            raw = await self._get_input(f"  请选择 {name}（输入编号或名称）: ")
+            raw = await self._get_input(f"请选择{name}（{choices_str}）: ")
             raw = raw.strip()
             # 按编号选择
             if raw.isdigit():
@@ -152,7 +190,7 @@ class HumanAgent(AgentBase):
     async def _prompt_bool_field(self, name: str, hint: str) -> bool:
         print(hint)
         while True:
-            raw = await self._get_input(f"  {name}? (y/n): ")
+            raw = await self._get_input(f"请选择{name}（y=是 / n=否）: ")
             raw = raw.strip().lower()
             if raw in ("y", "yes", "是"):
                 return True
@@ -252,7 +290,107 @@ class HumanAgent(AgentBase):
 
     async def _get_input(self, prompt: str) -> str:
         """异步读取终端输入（避免阻塞事件循环）"""
+        run_id = os.environ.get("HUMAN_INPUT_RUN_ID")
+        if run_id:
+            root = os.environ.get("HUMAN_INPUT_DIR") or os.path.join(os.getcwd(), "exports", "human_inputs")
+            path = human_input_queue_path(run_id, self.seat_num, root)
+            self._emit_waiting_event(prompt)
+            print(f"{prompt}[等待前端提交，队列: {path}]")
+            while True:
+                text = await asyncio.to_thread(pop_human_input, path)
+                if text:
+                    print(f"[前端输入] {text}")
+                    return text
+                await asyncio.sleep(1)
         return await asyncio.to_thread(input, prompt)
+
+    def _emit_waiting_event(self, prompt: str = "") -> None:
+        """写一个 human_waiting 事件到游戏 JSONL，通知前端轮到真人"""
+        jsonl_path = os.environ.get("GAME_JSONL_PATH")
+        if not jsonl_path:
+            return
+        from datetime import datetime
+        event = {
+            "event_type": "human_waiting",
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "player": self.name,
+            "seat": self.seat_num,
+            "prompt": prompt.strip(),
+        }
+        try:
+            with open(jsonl_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(event, ensure_ascii=False) + "\n")
+                f.flush()
+        except OSError:
+            pass
+
+    def _emit_observe_event(self, msg) -> None:
+        """将旁白/主持人对真人说的话写入 JSONL，让前端能展示"""
+        jsonl_path = os.environ.get("GAME_JSONL_PATH")
+        if not jsonl_path:
+            return
+        content = getattr(msg, "content", None)
+        if not content or not str(content).strip():
+            return
+        msg_name = getattr(msg, "name", "")
+        msg_role = getattr(msg, "role", "")
+        # 只写旁白/主持人/系统的消息，不写其他玩家的发言（避免重复）
+        if msg_name != "游戏主持人" and msg_role != "system":
+            return
+        # 不重复写自己的消息
+        if msg_name == self.name:
+            return
+        from datetime import datetime
+        event = {
+            "event_type": "model_call",
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "player": "旁白",
+            "role": "主持人",
+            "phase": "narration",
+            "model_name": "system",
+            "seat": "旁白",
+            "output_content": {"content": str(content).strip()},
+        }
+        try:
+            with open(jsonl_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(event, ensure_ascii=False) + "\n")
+                f.flush()
+        except OSError:
+            pass
+
+    @staticmethod
+    def _should_auto_fill(field_name: str, field_info) -> bool:
+        """判断该字段是否对真人无意义，应自动填充"""
+        _SKIP_FIELDS = {
+            "kill_strategy", "team_coordination", "coordination_plan",
+            "action_reason", "reasoning_steps", "key_evidence",
+            "confidence_level", "reach_agreement",
+        }
+        if field_name in _SKIP_FIELDS:
+            return True
+        from pydantic.fields import PydanticUndefined
+        if field_info.default is not None and field_info.default is not ... and field_info.default is not PydanticUndefined:
+            return True
+        return False
+
+    @staticmethod
+    def _get_auto_fill_value(field_name: str, field_info):
+        """为自动填充字段生成默认值"""
+        from pydantic.fields import PydanticUndefined
+        if field_info.default is not None and field_info.default is not ... and field_info.default is not PydanticUndefined:
+            return field_info.default
+        annotation = field_info.annotation
+        import typing
+        origin = getattr(annotation, "__origin__", None)
+        if origin is typing.Union and type(None) in annotation.__args__:
+            return None
+        if annotation is bool:
+            return False
+        if annotation is int:
+            return 5
+        if annotation is list or (origin is list):
+            return ["真人决策"]
+        return "真人决策"
 
     @staticmethod
     def _extract_literal_choices(annotation) -> list:

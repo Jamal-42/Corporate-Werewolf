@@ -20,4 +20,9 @@ Thumbs.db
 exports/
 INTERVIEW_NOTES.md
 .ipynb_checkpoints/
-
+reports/
+tmp_response.json
+vendor/
+python
+node_modules/
+.next/

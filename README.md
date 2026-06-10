@@ -55,7 +55,7 @@ DASHSCOPE_API_KEY=sk-xxxxxxxx
 |------|------|--------|
 | 玩家人数 | 6 / 9 / 12 | 12 |
 | Prompt版本 | v2 / v3 | v2 |
-| Skills版本 | 留空=不注入，填 evo_1 / evo_3 等 | 不注入 |
+| Skills版本 | 留空=不注入，填 evo_6 / evo_8 等 | 不注入 |
 
 **输出文件**（自动时间戳命名）：
 - `exports/game_{人数}p_{时间戳}.txt` — 人类可读的游戏叙事
@@ -66,7 +66,7 @@ DASHSCOPE_API_KEY=sk-xxxxxxxx
 ```bash
 python main_cn.py --players 12 --prompt-version v2 --log exports/game_12p_20260604_120000
 python main_cn.py --players 6  # 最简形式
-python main_cn.py --players 12 --skills-version evo_1  # 注入 Skills
+python main_cn.py --players 12 --skills-version evo_8  # 注入 Skills
 ```
 
 ### 2. 批量运行
@@ -302,6 +302,32 @@ python -m pytest tests/test_voting.py -v
 | CEO一晚一份 | 留人offer和辞退信一晚只能用一份，各只能用一次 |
 | 法务诉讼限制 | 被辞退信开除不能发起诉讼，被窃取离职可以 |
 | 狼人自刀防护 | 代码过滤掉狼人互投的票（代码强制执行） |
+
+---
+
+## 前端系统（Next.js）
+
+除了 Python 后端的 Web UI，项目还包含一套独立的 Next.js 前端，提供实时对局观战、回放、人机混战等功能。
+
+### 启动
+
+```bash
+cd frontend
+npm install   # 首次安装依赖
+npm run dev   # 启动开发服务器
+# 访问 http://localhost:3000
+```
+
+### 功能
+
+| 功能 | 说明 |
+|------|------|
+| SSE 实时流 | 后端对局进行时，前端实时展示事件 |
+| 对局回放 | 选择 exports/ 下的 .jsonl 文件回放 |
+| 3D 竞技场 | Three.js 渲染玩家座位布局 |
+| TTS 语音播报 | 对局事件自动语音播报 |
+| ASR 语音输入 | 人机混战时支持语音输入发言 |
+| 认知雷达 | 12维 Agent 表现分析面板 |
 
 ---
 

@@ -150,12 +150,17 @@ function renderSummary(){
 function renderLeaderboard(){
   const lb=R.leaderboard||[];
   const llm=hasLLM();
-  let h=`<thead><tr><th>#</th><th>玩家</th><th>角色</th><th>决策</th><th>发言</th><th>投票</th><th>技能</th><th>综合</th>`;
+  const personas=R.personas||{};const models=R.models||{};
+  const hasMeta=Object.keys(personas).length>0||Object.keys(models).length>0;
+  let h=`<thead><tr><th>#</th><th>玩家</th><th>角色</th>`;
+  if(hasMeta)h+=`<th>人设</th><th>模型</th>`;
+  h+=`<th>决策</th><th>发言</th><th>投票</th><th>技能</th><th>综合</th>`;
   if(llm)h+=`<th>融合分</th><th>策略标签</th>`;
   h+=`<th>高危</th></tr></thead><tbody>`;
   lb.forEach((e,i)=>{
     const rc=roleCls(e.role);
     h+=`<tr><td>${i+1}</td><td>${esc(e.player)}</td><td class="${rc}">${roleDisplay(e.role)}</td>`;
+    if(hasMeta)h+=`<td>${esc(personas[e.player]||"-")}</td><td style="font-size:.8rem">${esc(models[e.player]||"-")}</td>`;
     h+=`<td>${e.decision_count||0}</td>`;
     h+=`<td>${fmt(e.speech_score,1)}</td><td>${fmt(e.vote_score,1)}</td><td>${fmt(e.skill_score,1)}</td>`;
     h+=`<td style="font-weight:700;color:${scoreColor(e.overall_score)}">${fmt(e.overall_score)}</td>`;
@@ -283,13 +288,18 @@ function renderFindings(){
 
 function renderPlayerCards(){
   const lb=R.leaderboard||[];const evts=R.events||[];
+  const personas=R.personas||{};const models=R.models||{};
   let h="";
   lb.forEach(e=>{
     const rc=roleCls(e.role);
     const pEvts=evts.filter(x=>x.player===e.player).slice(-10);
     const llm=llmForPlayer(e.player);
+    const persona=personas[e.player]||"";
+    const model=models[e.player]||"";
     h+=`<div class="player-card">`;
-    h+=`<div class="pheader"><div><div class="pname">${esc(e.player)}</div><div class="${rc}" style="font-size:.85rem">${roleDisplay(e.role)}</div></div>`;
+    h+=`<div class="pheader"><div><div class="pname">${esc(e.player)}</div><div class="${rc}" style="font-size:.85rem">${roleDisplay(e.role)}${persona?" · "+esc(persona):""}</div>`;
+    if(model)h+=`<div style="font-size:.75rem;color:var(--muted)">${esc(model)}</div>`;
+    h+=`</div>`;
     h+=`<div class="pscore" style="color:${scoreColor(e.overall_score)}">${fmt(e.overall_score)}</div></div>`;
     [["发言",e.speech_score,"#00d2ff"],["投票",e.vote_score,"#4ecdc4"],["技能",e.skill_score,"#ffd700"]].forEach(([lb2,v,c])=>{
       h+=`<div class="stat"><span class="k">${lb2}</span><span>${fmt(v,1)}</span></div>`;

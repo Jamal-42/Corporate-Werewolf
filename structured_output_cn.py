@@ -133,7 +133,7 @@ def validate_structured_response(response: Any, model_class: type[BaseModel]) ->
     return None
 
 class DiscussionModelCN(BaseModel):
-    """中文版讨论输出格式"""
+    """中文版讨论输出格式。示例：{"reasoning_steps":["3号昨晚被窃取说明间谍目标是技术骨干","5号今天发言回避了对3号的态度变化","结合第一轮5号投了无辜的7号，行为链可疑"],"key_evidence":"5号连续两轮投票方向与公开表态矛盾","reach_agreement":false,"confidence_level":7}"""
 
     reasoning_steps: List[str] = Field(
         description="分步推理过程：1.梳理已知线索 2.分析当前局势 3.制定策略理由 4.得出结论",
@@ -154,8 +154,8 @@ def get_vote_model_cn(agents: list[AgentBase]) -> type[BaseModel]:
     """获取中文版投票模型"""
     
     class VoteModelCN(BaseModel):
-        """中文版投票输出格式"""
-        
+        """中文版投票输出格式。示例：{"vote":"5号","reason":"5号连续两轮发言指向不同目标且无法自圆其说，结合昨晚被保护的是2号而非5号声称的自己，高度怀疑其为间谍","suspicion_level":8}"""
+
         vote: Literal[tuple(_.name for _ in agents)] = Field(
             description="你要投票淘汰的玩家座位号（如3号）",
         )
@@ -170,8 +170,8 @@ def get_vote_model_cn(agents: list[AgentBase]) -> type[BaseModel]:
     return VoteModelCN
 
 class WitchActionModelCN(BaseModel):
-    """中文版女巫行动模型"""
-    
+    """中文版女巫行动模型。示例：{"use_antidote":true,"use_poison":false,"target_name":"3号","action_reason":"3号是已验证的好人且本局情报关键，必须挽留"}"""
+
     use_antidote: bool = Field(
         description="是否使用留人offer挽留",
         default=False
@@ -194,8 +194,8 @@ def get_seer_model_cn(agents: list[AgentBase]) -> type[BaseModel]:
     """获取中文版预言家模型"""
     
     class SeerModelCN(BaseModel):
-        """中文版预言家背调格式"""
-    
+        """中文版预言家背调格式。示例：{"target":"5号","check_reason":"5号第二轮突然改口为8号辩护，与首轮态度截然相反，需要验证身份","priority_level":9}"""
+
         target: Literal[tuple(_.name for _ in agents)] = Field(
             description="要背调的玩家座位号（如5号）",
         )
@@ -213,7 +213,7 @@ def get_hunter_model_cn(agents: list[AgentBase]) -> type[BaseModel]:
     """获取中文版猎人模型"""
 
     class HunterModelCN(BaseModel):
-        """你已被投票/窃取出局，作为法务总监，你现在必须决定是否发起诉讼带走一名员工。如果你认为是间谍，强烈建议发起诉讼（shoot=true）。"""
+        """你已被投票/窃取出局，作为法务总监，你现在必须决定是否发起诉讼带走一名员工。示例：{"shoot":true,"target":"8号","shoot_reason":"8号全程低调但投票方向与间谍高度一致，结合2号验出的信息，确信其为间谍"}"""
 
         shoot: bool = Field(
             description="是否发起诉讼。你已出局，作为法务总监应积极发起诉讼带走可疑员工（shoot=true）。",
@@ -234,7 +234,7 @@ def get_guard_model_cn(agents: list[AgentBase]) -> type[BaseModel]:
     """获取中文版守护者模型"""
 
     class GuardModelCN(BaseModel):
-        """中文版安保主管保护格式"""
+        """中文版安保主管保护格式。示例：{"target":"2号","guard_reason":"2号昨天公开了HR总监身份，间谍大概率今晚针对，交替保护优先级最高"}"""
 
         target: Literal[tuple(_.name for _ in agents)] = Field(
             description="要加密保护的玩家座位号（如2号）",
@@ -246,7 +246,7 @@ def get_guard_model_cn(agents: list[AgentBase]) -> type[BaseModel]:
     return GuardModelCN
 
 class WerewolfKillModelCN(BaseModel):
-    """中文版间谍窃取模型"""
+    """中文版间谍窃取模型。示例：{"target":"2号","kill_strategy":"2号是HR总监，已验出我方8号身份，必须优先清除情报威胁","team_coordination":"配合5号明天带节奏把怀疑引向7号"}"""
 
     target: str = Field(
         description="要窃取信息的目标玩家座位号（如6号）",

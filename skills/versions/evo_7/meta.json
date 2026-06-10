@@ -1,0 +1,15 @@
+{
+  "version": "evo_7",
+  "generated_at": "2026-06-08T10:08:37",
+  "source_report": "F:\\code\\were\\reports\\evaluation_report_20260608_100828_622987.json",
+  "mode": "llm",
+  "roles": [
+    "间谍",
+    "HR总监",
+    "普通员工",
+    "安保主管",
+    "CEO",
+    "法务总监"
+  ],
+  "granularity": "role_x_stage_x_event_type"
+}

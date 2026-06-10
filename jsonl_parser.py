@@ -115,13 +115,20 @@ def parse_log_jsonl(jsonl_path: Path | str) -> tuple[dict[str, str], list[str], 
                 category = "vote" if action == "投票" else "skill" if action in (
                     "间谍窃取", "HR背调", "加密保护", "CEO挽留", "CEO辞退", "法务诉讼"
                 ) else "speech"
-                reason = event.get("key_evidence") or ""
-                raw = json.dumps(event.get("full_output") or event, ensure_ascii=False)
+                full_output = event.get("full_output") or {}
+                reason = full_output.get("reason") or event.get("key_evidence") or ""
+                raw = json.dumps(full_output or event, ensure_ascii=False)
                 metadata = {}
                 if event.get("reasoning_steps"):
                     metadata["reasoning_steps"] = event["reasoning_steps"]
                 if event.get("key_evidence"):
                     metadata["key_evidence"] = event["key_evidence"]
+                if full_output.get("suspicion_level"):
+                    metadata["suspicion_level"] = full_output["suspicion_level"]
+                if full_output.get("vote"):
+                    metadata["vote"] = full_output["vote"]
+                if full_output.get("reason"):
+                    metadata["reason"] = full_output["reason"]
                 events.append(DecisionEvent(
                     id=event_id,
                     round=event.get("round"),
@@ -138,37 +145,21 @@ def parse_log_jsonl(jsonl_path: Path | str) -> tuple[dict[str, str], list[str], 
 
             elif et == "vote_result":
                 event_id += 1
-                votes = event.get("votes", {})
                 voted_out = event.get("voted_out")
                 vote_count = event.get("vote_count", 0)
-                seat_votes = event.get("seat_votes")
-                # 优先使用 seat_votes（座次号->座次号），否则翻译 votes
-                vote_map = {}
-                if seat_votes and isinstance(seat_votes, dict):
-                    for voter, target in seat_votes.items():
-                        v = _to_seat_key(voter, seat_map)
-                        t = _to_seat_key(target, seat_map) if target else target
-                        vote_map[v] = t
-                else:
-                    for voter, target in votes.items():
-                        v = _to_seat_key(voter, seat_map)
-                        t = _to_seat_key(target, seat_map) if target else target
-                        vote_map[v] = t
-                for voter, target in vote_map.items():
-                    event_id += 1
-                    events.append(DecisionEvent(
-                        id=event_id,
-                        round=event.get("round"),
-                        phase="白天投票",
-                        player=voter,
-                        role=roles.get(voter, "未知"),
-                        category="vote",
-                        action="投票",
-                        target=target,
-                        reason="",
-                        raw=json.dumps({"vote": target, "voted_out": voted_out, "vote_count": vote_count}, ensure_ascii=False),
-                        metadata={"voted_out": voted_out, "vote_count": vote_count},
-                    ))
+                events.append(DecisionEvent(
+                    id=event_id,
+                    round=event.get("round"),
+                    phase="白天投票",
+                    player="全员",
+                    role="系统",
+                    category="other",
+                    action="投票结算",
+                    target=_to_seat_key(voted_out, seat_map) if voted_out else None,
+                    reason=f"{voted_out}以{vote_count}票出局" if voted_out else "平票无人出局",
+                    raw=json.dumps(event, ensure_ascii=False),
+                    metadata={"voted_out": voted_out, "vote_count": vote_count},
+                ))
 
             elif et == "skill_resolution":
                 event_id += 1

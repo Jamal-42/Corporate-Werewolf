@@ -262,7 +262,21 @@ def build_counterfactual(event: DecisionEvent, title: str, roles: dict[str, str]
         return f"若CEO保留辞退信或辞退 {wolves[0]}，公司阵营可避免关键轮次减员。"
     if "诉讼错" in title and wolves:
         return f"若法务总监诉讼目标改为 {wolves[0]}，可用临终技能换掉间谍坑。"
-    return "反事实建议：保留该决策但补充证据链，或选择信息增量更高、阵营收益更大的目标。"
+    if "内投" in title:
+        return f"若 {event.player} 改投非队友目标，可避免暴露间谍身份关联；倒钩需提前铺垫、收益需大于暴露风险。"
+    if "投票理由不足" in title:
+        return f"若 {event.player} 补充'因为X号第N轮发言与投票矛盾'等具体证据，可增强说服力并为后续复盘留据。"
+    if "技能理由不足" in title:
+        return f"若 {event.player} 输出完整的决策理由（如背调优先级排序、保护收益分析），评测系统可追溯决策质量。"
+    if "发言过短" in title:
+        return f"若 {event.player} 补充身份判断、证据来源和下一步策略，可提升发言信息密度和可追溯性。"
+    if "重复输出" in title:
+        return f"若收紧结构化输出 schema 并加入重试上限，可避免 {event.player} 陷入复读循环。"
+    if "缺少证据链" in title:
+        return f"若 {event.player} 引用具体发言序号或投票记录作为论据，可从'直觉判断'升级为'逻辑推断'。"
+    if "目标异常" in title:
+        return f"若 {event.player} 选择非自身目标，技能可产出更高信息增量或阵营收益。"
+    return f"建议 {event.player} 在该决策中补充可追溯的证据链或选择信息增量更高的目标。"
 
 
 def evaluate_events(roles: dict[str, str], events: list[DecisionEvent],
@@ -356,6 +370,35 @@ def evaluate_events(roles: dict[str, str], events: list[DecisionEvent],
     return result
 
 
+def _extract_jsonl_meta(jsonl_path: Path) -> tuple[dict[str, str], dict[str, str]]:
+    """从 jsonl 的 game_init 事件中提取人设名和模型名"""
+    personas: dict[str, str] = {}
+    models: dict[str, str] = {}
+    with open(jsonl_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if event.get("event_type") == "game_init":
+                for entry in event.get("character_role_map", []):
+                    seat = entry.get("seat_num")
+                    if not seat:
+                        continue
+                    key = f"{seat}号"
+                    char_name = entry.get("character_name", "")
+                    model_name = entry.get("model_name", "")
+                    if char_name:
+                        personas[key] = char_name
+                    if model_name:
+                        models[key] = model_name
+                break
+    return personas, models
+
+
 def evaluate_log(path: Path | None = None, text: str | None = None,
                   agent_version: str = "baseline",
                   enable_llm_judge: bool = False,
@@ -407,19 +450,35 @@ def evaluate_log(path: Path | None = None, text: str | None = None,
             try:
                 from jsonl_parser import parse_log_jsonl
                 roles, player_order, events = parse_log_jsonl(path)
-                return evaluate_events(roles, events, agent_version=agent_version,
+                report = evaluate_events(roles, events, agent_version=agent_version,
                                       enable_llm_judge=enable_llm_judge,
                                       llm_sample_rate=llm_sample_rate,
                                       jsonl_path=jsonl_path,
                                       player_order=player_order)
+                # 从 game_init 提取人设名和模型信息
+                personas, models = _extract_jsonl_meta(path)
+                if personas:
+                    report["personas"] = personas
+                if models:
+                    report["models"] = models
+                report["source_file"] = str(path)
+                return report
             except Exception:
                 pass  # 回退到 .txt 解析
         text = read_text_auto(path)
     roles, _players, events = parse_log_text(text)
+    # 提取人设名
+    personas: dict[str, str] = {}
+    for line in text.splitlines():
+        m = re.search(r"【(?P<seat>\d+号)】.*?职场人设是(?P<persona>[^。\s]+)", line)
+        if m:
+            personas[m.group("seat")] = m.group("persona")
     report = evaluate_events(roles, events, agent_version=agent_version,
                               enable_llm_judge=enable_llm_judge,
                               llm_sample_rate=llm_sample_rate,
                               jsonl_path=jsonl_path)
+    if personas:
+        report["personas"] = personas
     report["source_file"] = str(path) if path else "demo_bad_case"
     return report
 
@@ -469,24 +528,37 @@ def write_reports(report: dict[str, Any], output_dir: Path = REPORT_DIR) -> tupl
 
 def demo_bad_case_log() -> str:
     return """
-游戏主持人: 📢 【1号】你在这场职场狼人杀中扮演商业间谍，你的身份是间谍。
-游戏主持人: 📢 【2号】你在这场职场狼人杀中扮演HR总监，你的身份是预言家。
-游戏主持人: 📢 【3号】你在这场职场狼人杀中扮演CEO，你的身份是女巫。
-游戏主持人: 📢 【4号】你在这场职场狼人杀中扮演法务总监，你的身份是猎人。
-游戏主持人: 📢 【5号】你在这场职场狼人杀中扮演普通员工，你的身份是村民。
-游戏主持人: 📢 【6号】你在这场职场狼人杀中扮演普通员工，你的身份是村民。
+游戏主持人: 📢 【1号】你在这场职场狼人杀中扮演商业间谍，你的身份是间谍。你的职场人设是铁头哥。
+游戏主持人: 📢 【2号】你在这场职场狼人杀中扮演HR总监，你的身份是预言家。你的职场人设是卷王。
+游戏主持人: 📢 【3号】你在这场职场狼人杀中扮演CEO，你的身份是女巫。你的职场人设是PUA总裁。
+游戏主持人: 📢 【4号】你在这场职场狼人杀中扮演法务总监，你的身份是猎人。你的职场人设是暴躁哥。
+游戏主持人: 📢 【5号】你在这场职场狼人杀中扮演普通员工，你的身份是村民。你的职场人设是老油条。
+游戏主持人: 📢 【6号】你在这场职场狼人杀中扮演普通员工，你的身份是村民。你的职场人设是小透明。
 游戏主持人: 📢 职场狼人杀游戏开始！参与者：1号、2号、3号、4号、5号、6号
 游戏主持人: 📢 🌙 第1夜降临，天黑请闭眼...
+游戏主持人: 📢 间谍请睁眼，讨论窃取目标...
 1号: {"target":"1号","kill_strategy":"随便窃取一个，先隐藏自己","team_coordination":"无"}
+游戏主持人: 📢 HR总监请睁眼，选择背调目标...
 2号: {"target":"2号","check_reason":"我想先确认自己是不是好人","priority_level":10}
+游戏主持人: 📢 CEO请睁眼，决定是否使用技能...
 3号: {"use_antidote":false,"use_poison":true,"target_name":"5号","action_reason":"感觉他话多"}
+游戏主持人: 📢 法务总监被窃取出局，是否发起诉讼...
 4号: {"shoot":true,"target":"6号","shoot_reason":"盲狙一下"}
 游戏主持人: 📢 ☀️ 第1天天亮了，请大家睁眼...
+游戏主持人: 📢 昨夜，4号领了大礼包离职，5号被CEO辞退。
+游戏主持人: 📢 例会开始，请各位发言。存活员工：1号、2号、3号、6号
+1号: 我觉得局势还不明朗，大家先观察观察吧。没什么好说的。
+2号: 我是HR总监，昨晚背调了自己...呃...确认自己是好人。我建议大家先不要急着投票，等更多信息。
 5号: 我觉得1号像好人。
 6号: 随便吧。
+游戏主持人: 📢 请投票选择要淘汰的员工
 2号: {"vote":"3号","reason":"没有证据，感觉像间谍","suspicion_level":5}
 5号: {"vote":"6号","reason":"他沉默","suspicion_level":4}
 6号: {"vote":"5号","reason":"他说我沉默","suspicion_level":4}
+1号: {"vote":"2号","reason":"HR总监背调自己太可疑了","suspicion_level":6}
+3号: {"vote":"6号","reason":"小透明话最少，优先淘汰","suspicion_level":3}
+游戏主持人: 📢 投票结果：6号以2票被投出，领大礼包走人。
+游戏主持人: 📢 [游戏结束] 间谍阵营胜利！好人数量不足。
 """.strip()
 
 
