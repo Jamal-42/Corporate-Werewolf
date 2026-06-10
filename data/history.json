@@ -1,0 +1,143 @@
+[
+  {
+    "generation": 1,
+    "started_at": "2026-06-07T21:50:03",
+    "finished_at": "2026-06-08T09:39:37",
+    "prev_version": "test_bat",
+    "new_version": "evo_6",
+    "final_version": "evo_6",
+    "games_played": 3,
+    "game_results": [
+      {
+        "winner": "间谍阵营胜利！所有神职角色已被淘汰（屠神成功）！",
+        "total_rounds": 4,
+        "jsonl_path": "exports/evo_game_12p_20260607_215003.jsonl",
+        "skills_injection": {
+          "skills_version": "test_bat",
+          "skills_targets": "all",
+          "injected_seats": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ]
+        }
+      },
+      {
+        "winner": "未知",
+        "total_rounds": 0,
+        "jsonl_path": "exports/evo_game_12p_20260607_222103.jsonl",
+        "skills_injection": {}
+      },
+      {
+        "winner": "间谍阵营胜利！间谍已经控制了公司（人数优势）！",
+        "total_rounds": 6,
+        "jsonl_path": "exports/evo_game_12p_20260608_090652.jsonl",
+        "skills_injection": {
+          "skills_version": "test_bat",
+          "skills_targets": "all",
+          "injected_seats": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ]
+        }
+      }
+    ],
+    "report_path": "F:\\code\\were\\reports\\evaluation_report_20260608_093635_625111.json"
+  },
+  {
+    "generation": 2,
+    "started_at": "2026-06-08T09:39:37",
+    "finished_at": "2026-06-08T10:08:37",
+    "prev_version": "evo_6",
+    "new_version": "evo_7",
+    "final_version": "evo_7",
+    "games_played": 3,
+    "game_results": [
+      {
+        "winner": "间谍阵营胜利！间谍已经控制了公司（人数优势）！",
+        "total_rounds": 2,
+        "jsonl_path": "exports/evo_game_12p_20260608_093937.jsonl",
+        "skills_injection": {
+          "skills_version": "evo_6",
+          "skills_targets": "all",
+          "injected_seats": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ]
+        }
+      },
+      {
+        "winner": "未知",
+        "total_rounds": 0,
+        "jsonl_path": "exports/evo_game_12p_20260608_095300.jsonl",
+        "skills_injection": {}
+      },
+      {
+        "winner": "未知",
+        "total_rounds": 0,
+        "jsonl_path": "exports/evo_game_12p_20260608_100826.jsonl",
+        "skills_injection": {}
+      }
+    ],
+    "report_path": "F:\\code\\were\\reports\\evaluation_report_20260608_100828_622987.json"
+  },
+  {
+    "generation": 3,
+    "started_at": "2026-06-08T10:08:37",
+    "finished_at": "2026-06-08T10:08:52",
+    "prev_version": "evo_7",
+    "new_version": "evo_8",
+    "final_version": "evo_8",
+    "games_played": 3,
+    "game_results": [
+      {
+        "winner": "未知",
+        "total_rounds": 0,
+        "jsonl_path": "exports/evo_game_12p_20260608_100837.jsonl",
+        "skills_injection": {}
+      },
+      {
+        "winner": "未知",
+        "total_rounds": 0,
+        "jsonl_path": "exports/evo_game_12p_20260608_100839.jsonl",
+        "skills_injection": {}
+      },
+      {
+        "winner": "未知",
+        "total_rounds": 0,
+        "jsonl_path": "exports/evo_game_12p_20260608_100840.jsonl",
+        "skills_injection": {}
+      }
+    ],
+    "report_path": "F:\\code\\were\\reports\\evaluation_report_20260608_100842_455787.json"
+  }
+]

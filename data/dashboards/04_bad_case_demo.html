@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>职场狼人杀评测Dashboard</title>
+<style>
+:root{--bg:#1a1a2e;--bg2:#16213e;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--accent:#00d2ff;--danger:#ff6b6b;--warn:#ffd700;--success:#4ecdc4;--info:#285a84;--text:#e0e0e0;--muted:#888;--font:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:linear-gradient(135deg,var(--bg) 0%,var(--bg2) 100%);color:var(--text);min-height:100vh;padding:20px;font-size:16px;line-height:1.6}
+.container{max-width:1400px;margin:0 auto}
+.header{text-align:center;padding:30px 0;border-bottom:1px solid var(--border);margin-bottom:30px}
+.header h1{font-size:2.2rem;background:linear-gradient(90deg,#00d2ff,#3a7bd5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header .meta{color:var(--muted);margin-top:10px;font-size:.9rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:30px}
+.card{background:var(--surface);border-radius:12px;padding:18px;border:1px solid var(--border);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.card .label{color:var(--muted);font-size:.85rem;margin-bottom:6px}
+.card .value{font-size:1.8rem;font-weight:700;color:var(--accent)}
+.section{background:var(--surface);border-radius:12px;padding:24px;margin-bottom:28px;border:1px solid var(--border)}
+.section h2{color:#fff;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border);font-size:1.3rem}
+.llm-only{display:none}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:rgba(0,210,255,.1);color:var(--accent);font-weight:600;white-space:nowrap}
+tr:hover{background:rgba(255,255,255,.03)}
+.role-wolf{color:var(--danger)}
+.role-good{color:var(--success)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;margin:1px 2px}
+.tag-strategy{background:rgba(0,210,255,.2);color:var(--accent)}
+.tag-risk-high{background:rgba(255,107,107,.2);color:var(--danger)}
+.tag-risk-mid{background:rgba(255,215,0,.2);color:var(--warn)}
+.tag-risk-low{background:rgba(78,205,196,.2);color:var(--success)}
+.tag-mistake{background:rgba(255,107,107,.15);color:#ff9999}
+.tag-impact{background:rgba(255,215,0,.15);color:#ffe066}
+.bar-chart{display:flex;flex-direction:column;gap:6px}
+.bar-row{display:flex;align-items:center;gap:8px}
+.bar-label{width:80px;font-size:.82rem;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-container{flex:1;height:22px;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden;display:flex}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:.72rem;color:#fff;min-width:24px;transition:width .5s ease}
+.bar-rule{background:linear-gradient(90deg,#3a7bd5,#00d2ff)}
+.bar-llm{background:linear-gradient(90deg,#ffd700,#ff8c00)}
+.bar-fused{background:linear-gradient(90deg,#4ecdc4,#00d2ff)}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-top:16px}
+.chart-box{background:rgba(255,255,255,.03);border-radius:10px;padding:16px;border:1px solid rgba(255,255,255,.06)}
+.chart-box h3{margin-bottom:12px;color:#fff;font-size:1rem}
+.finding-card{padding:14px;margin-bottom:10px;border-radius:0 8px 8px 0;border-left:3px solid}
+.finding-high{background:rgba(255,107,107,.1);border-color:var(--danger)}
+.finding-medium{background:rgba(255,215,0,.08);border-color:var(--warn)}
+.finding-low{background:rgba(40,90,132,.1);border-color:var(--info)}
+.finding-card .title{font-weight:700;margin-bottom:4px}
+.finding-card .evidence{color:var(--muted);font-size:.85rem;margin-bottom:4px}
+.finding-card .rec{color:var(--success);font-size:.85rem}
+.finding-card .cf{color:var(--warn);font-size:.82rem;margin-top:4px;padding-top:4px;border-top:1px dashed rgba(255,255,255,.1)}
+.finding-card .llm-comment{color:#c0c0ff;font-size:.82rem;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}
+.player-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
+.player-card{background:rgba(255,255,255,.03);border-radius:10px;padding:18px;border:1px solid rgba(255,255,255,.06)}
+.player-card .pheader{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.player-card .pname{font-size:1.1rem;font-weight:700}
+.player-card .pscore{font-size:1.4rem;font-weight:700;color:var(--accent)}
+.player-card .stat{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.88rem}
+.player-card .stat .k{color:var(--muted)}
+.stat-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:3px;overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:3px}
+.event-timeline{margin-top:10px;max-height:200px;overflow-y:auto;font-size:.78rem}
+.event-timeline .ev{padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.discrepancy-card{background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:8px;padding:14px;margin-bottom:10px}
+.discrepancy-card .gap{font-size:1.2rem;font-weight:700;color:var(--warn)}
+.agg-table{width:100%;font-size:.85rem}
+.agg-table td,.agg-table th{padding:6px 8px}
+.expand-btn{cursor:pointer;color:var(--accent);font-size:.82rem;border:none;background:none;padding:4px 0}
+.expand-btn:hover{text-decoration:underline}
+.counterfactual-card{background:rgba(255,215,0,.06);border-left:3px solid var(--warn);padding:12px;margin-bottom:8px;border-radius:0 8px 8px 0}
+.counterfactual-card .cf-title{color:var(--warn);font-weight:700;font-size:.9rem}
+.counterfactual-card .cf-body{color:var(--muted);font-size:.85rem;margin-top:4px}
+@media(max-width:900px){.cards{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}.charts-grid{grid-template-columns:1fr}.player-grid{grid-template-columns:1fr}}
+@media(max-width:560px){body{padding:10px}.section{padding:14px}table{font-size:.78rem}th,td{padding:6px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><h1>职场狼人杀评测Dashboard</h1><div class="meta" id="header-meta"></div></div>
+<div id="summary-section"></div>
+<section class="section"><h2>排行榜</h2><div style="overflow-x:auto"><table id="leaderboard-table"></table></div></section>
+<section class="section"><h2>维度评分对比</h2><div id="dimension-section" class="charts-grid"></div></section>
+<section class="section llm-only"><h2>策略分布</h2><div id="strategy-section"></div></section>
+<section class="section llm-only"><h2>博弈深度分布</h2><div id="depth-section"></div></section>
+<section class="section"><h2>关键失误</h2><div id="findings-section"></div></section>
+<section class="section"><h2>玩家详情</h2><div id="players-section" class="player-grid"></div></section>
+<section class="section llm-only"><h2>LLM聚合分析</h2><div id="aggregate-section"></div></section>
+<section class="section llm-only"><h2>评分差异</h2><div id="discrepancy-section"></div></section>
+<section class="section"><h2>反事实推演</h2><div id="counterfactual-section"></div></section>
+</div>
+<script id="report-data" type="application/json">{"generated_at": "2026-06-10T19:52:17", "agent_version": "bad_case_demo", "summary": {"overall_score": 43.74, "decision_count": 19, "player_count": 6, "high_severity_mistakes": 2, "medium_severity_mistakes": 6, "coverage": {"skill": 10, "speech": 4, "vote": 4, "other": 1}}, "dimension_scores": {"skill": 35.1, "speech": 52.75, "vote": 53.5, "other": 55.0}, "roles": {"1号": "狼人", "2号": "预言家", "3号": "女巫", "4号": "猎人", "5号": "村民", "6号": "村民"}, "seat_characters": {"铁头哥": "狼人", "卷王": "预言家", "PUA总裁": "女巫", "暴躁哥": "猎人", "老油条": "村民", "小透明": "村民"}, "leaderboard": [{"player": "4号", "role": "猎人", "agent_version": "bad_case_demo", "overall_score": 59.54, "speech_score": 50.67, "vote_score": 86.0, "skill_score": 50.75, "decision_count": 4, "critical_mistakes": 0}, {"player": "3号", "role": "女巫", "agent_version": "bad_case_demo", "overall_score": 46.62, "speech_score": 52.0, "vote_score": 33.0, "skill_score": 50.75, "decision_count": 4, "critical_mistakes": 0}, {"player": "5号", "role": "村民", "agent_version": "bad_case_demo", "overall_score": 42.5, "speech_score": 0, "vote_score": 0, "skill_score": 42.5, "decision_count": 1, "critical_mistakes": 0}, {"player": "6号", "role": "村民", "agent_version": "bad_case_demo", "overall_score": 42.0, "speech_score": 0, "vote_score": 0, "skill_score": 42.0, "decision_count": 1, "critical_mistakes": 0}, {"player": "2号", "role": "预言家", "agent_version": "bad_case_demo", "overall_score": 37.54, "speech_score": 54.67, "vote_score": 32.0, "skill_score": 31.75, "decision_count": 4, "critical_mistakes": 0}, {"player": "1号", "role": "狼人", "agent_version": "bad_case_demo", "overall_score": 29.17, "speech_score": 53.67, "vote_score": 63.0, "skill_score": 0.0, "decision_count": 4, "critical_mistakes": 2}], "findings": [{"id": 1, "severity": "high", "player": "1号", "role": "狼人", "category": "skill", "title": "间谍误窃队友", "evidence": "间谍目标是 1号（间谍）。", "recommendation": "夜间目标应排除间谍队友，并优先窃取HR总监/CEO等高价值好人。", "counterfactual": "若间谍队改窃 2号，可削弱公司技能链，而不是自损间谍坑。", "score_delta": -70, "round": 1}, {"id": 6, "severity": "high", "player": "1号", "role": "狼人", "category": "skill", "title": "间谍误窃队友", "evidence": "间谍目标是 1号（间谍）。", "recommendation": "夜间目标应排除间谍队友，并优先窃取HR总监/CEO等高价值好人。", "counterfactual": "若间谍队改窃 2号，可削弱公司技能链，而不是自损间谍坑。", "score_delta": -70, "round": 1}, {"id": 2, "severity": "medium", "player": "1号", "role": "狼人", "category": "skill", "title": "技能目标异常", "evidence": "技能目标指向自己，通常信息增量或收益较低。", "recommendation": "为每个技能设置合法目标过滤器。", "counterfactual": "若 1号 选择非自身目标，技能可产出更高信息增量或阵营收益。", "score_delta": -20, "round": 1}, {"id": 3, "severity": "medium", "player": "2号", "role": "预言家", "category": "skill", "title": "技能目标异常", "evidence": "技能目标指向自己，通常信息增量或收益较低。", "recommendation": "为每个技能设置合法目标过滤器。", "counterfactual": "若 2号 选择非自身目标，技能可产出更高信息增量或阵营收益。", "score_delta": -20, "round": 1}, {"id": 7, "severity": "medium", "player": "1号", "role": "狼人", "category": "skill", "title": "技能目标异常", "evidence": "技能目标指向自己，通常信息增量或收益较低。", "recommendation": "为每个技能设置合法目标过滤器。", "counterfactual": "若 1号 选择非自身目标，技能可产出更高信息增量或阵营收益。", "score_delta": -20, "round": 1}, {"id": 9, "severity": "medium", "player": "2号", "role": "预言家", "category": "skill", "title": "技能目标异常", "evidence": "技能目标指向自己，通常信息增量或收益较低。", "recommendation": "为每个技能设置合法目标过滤器。", "counterfactual": "若 2号 选择非自身目标，技能可产出更高信息增量或阵营收益。", "score_delta": -20, "round": 1}, {"id": 16, "severity": "medium", "player": "2号", "role": "预言家", "category": "vote", "title": "好人误投好人", "evidence": "2号（预言家）投向 3号（女巫）。", "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。", "counterfactual": "若 2号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。", "score_delta": -28, "round": 1}, {"id": 17, "severity": "medium", "player": "3号", "role": "女巫", "category": "vote", "title": "好人误投好人", "evidence": "3号（女巫）投向 2号（预言家）。", "recommendation": "优先交叉验证查验、发言矛盾和狼队收益，不要只凭情绪投票。", "counterfactual": "若 3号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。", "score_delta": -28, "round": 1}, {"id": 4, "severity": "low", "player": "3号", "role": "女巫", "category": "skill", "title": "技能理由不足", "evidence": "技能决策缺少解释，无法复盘。", "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。", "counterfactual": "若 3号 输出完整的决策理由（如背调优先级排序、保护收益分析），评测系统可追溯决策质量。", "score_delta": -15, "round": 1}, {"id": 5, "severity": "low", "player": "4号", "role": "猎人", "category": "skill", "title": "技能理由不足", "evidence": "技能决策缺少解释，无法复盘。", "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。", "counterfactual": "若 4号 输出完整的决策理由（如背调优先级排序、保护收益分析），评测系统可追溯决策质量。", "score_delta": -15, "round": 1}, {"id": 8, "severity": "low", "player": "1号", "role": "狼人", "category": "skill", "title": "技能理由不足", "evidence": "技能决策缺少解释，无法复盘。", "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。", "counterfactual": "若 1号 输出完整的决策理由（如背调优先级排序、保护收益分析），评测系统可追溯决策质量。", "score_delta": -15, "round": 1}, {"id": 10, "severity": "low", "player": "2号", "role": "预言家", "category": "skill", "title": "技能理由不足", "evidence": "技能决策缺少解释，无法复盘。", "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。", "counterfactual": "若 2号 输出完整的决策理由（如背调优先级排序、保护收益分析），评测系统可追溯决策质量。", "score_delta": -15, "round": 1}, {"id": 11, "severity": "low", "player": "5号", "role": "村民", "category": "skill", "title": "技能理由不足", "evidence": "技能决策缺少解释，无法复盘。", "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。", "counterfactual": "若 5号 输出完整的决策理由（如背调优先级排序、保护收益分析），评测系统可追溯决策质量。", "score_delta": -15, "round": 1}, {"id": 12, "severity": "low", "player": "6号", "role": "村民", "category": "skill", "title": "技能理由不足", "evidence": "技能决策缺少解释，无法复盘。", "recommendation": "每个技能输出 action_reason/check_reason/guard_reason。", "counterfactual": "若 6号 输出完整的决策理由（如背调优先级排序、保护收益分析），评测系统可追溯决策质量。", "score_delta": -15, "round": 1}, {"id": 13, "severity": "low", "player": "1号", "role": "狼人", "category": "speech", "title": "缺少证据链", "evidence": "发言有观点但没有引用发言、投票或技能信息。", "recommendation": "要求 Agent 使用“观点-证据-风险-行动”模板。", "counterfactual": "若 1号 引用具体发言序号或投票记录作为论据，可从'直觉判断'升级为'逻辑推断'。", "score_delta": -12, "round": 1}, {"id": 14, "severity": "low", "player": "2号", "role": "预言家", "category": "speech", "title": "缺少证据链", "evidence": "发言有观点但没有引用发言、投票或技能信息。", "recommendation": "要求 Agent 使用“观点-证据-风险-行动”模板。", "counterfactual": "若 2号 引用具体发言序号或投票记录作为论据，可从'直觉判断'升级为'逻辑推断'。", "score_delta": -12, "round": 1}, {"id": 15, "severity": "low", "player": "3号", "role": "女巫", "category": "speech", "title": "缺少证据链", "evidence": "发言有观点但没有引用发言、投票或技能信息。", "recommendation": "要求 Agent 使用“观点-证据-风险-行动”模板。", "counterfactual": "若 3号 引用具体发言序号或投票记录作为论据，可从'直觉判断'升级为'逻辑推断'。", "score_delta": -12, "round": 1}], "counterfactuals": ["若间谍队改窃 2号，可削弱公司技能链，而不是自损间谍坑。", "若间谍队改窃 2号，可削弱公司技能链，而不是自损间谍坑。", "若 1号 选择非自身目标，技能可产出更高信息增量或阵营收益。", "若 2号 选择非自身目标，技能可产出更高信息增量或阵营收益。", "若 1号 选择非自身目标，技能可产出更高信息增量或阵营收益。", "若 2号 选择非自身目标，技能可产出更高信息增量或阵营收益。", "若 2号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。", "若 3号 改投嫌疑更高的 1号，公司阵营可减少一次误出并提高下一轮信息密度。"], "events": [{"id": 1, "round": 1, "phase": "夜晚", "player": "1号", "role": "狼人", "category": "skill", "action": "间谍窃取", "target": "1号", "reason": "随便窃取一个，先隐藏自己", "raw": "{\"target\": \"1号\", \"kill_strategy\": \"随便窃取一个，先隐藏自己\", \"team_coordination\": \"无\"}", "metadata": {"reasoning_steps": ["第一夜没有信息", "随便选一个"], "key_evidence": "随便窃取一个，先隐藏自己"}, "score": 0.0, "metrics": {"reason_len": 12}}, {"id": 2, "round": 1, "phase": "夜晚", "player": "2号", "role": "预言家", "category": "skill", "action": "HR背调", "target": "2号", "reason": "我想先确认自己是不是好人", "raw": "{\"target\": \"2号\", \"check_reason\": \"我想先确认自己是不是好人\", \"priority_level\": 10}", "metadata": {"reasoning_steps": ["不确定自己的身份", "先查自己"], "key_evidence": "我想先确认自己是不是好人"}, "score": 41.0, "metrics": {"reason_len": 12}}, {"id": 3, "round": 1, "phase": "夜晚", "player": "3号", "role": "女巫", "category": "skill", "action": "CEO辞退", "target": "5号", "reason": "感觉他话多", "raw": "{\"use_antidote\": false, \"use_poison\": true, \"target_name\": \"5号\", \"action_reason\": \"感觉他话多\"}", "metadata": {"reasoning_steps": ["5号话多", "先毒了再说"], "key_evidence": "感觉他话多"}, "score": 42.5, "metrics": {"reason_len": 5}}, {"id": 4, "round": 1, "phase": "白天讨论", "player": "4号", "role": "猎人", "category": "skill", "action": "法务诉讼", "target": "6号", "reason": "盲狙一下", "raw": "{\"shoot\": true, \"target\": \"6号\", \"shoot_reason\": \"盲狙一下\"}", "metadata": {"reasoning_steps": ["随便带一个"], "key_evidence": "盲狙一下"}, "score": 42.0, "metrics": {"reason_len": 4}}, {"id": 5, "round": 1, "phase": "夜晚", "player": "1号", "role": "狼人", "category": "skill", "action": "间谍窃取", "target": "1号", "reason": "间谍窃取了自己", "raw": "{\"event_type\": \"skill_resolution\", \"round\": 1, \"skill_type\": \"spy_steal\", \"source_player\": \"铁头哥\", \"target_player\": \"铁头哥\", \"result\": \"间谍窃取了自己\"}", "metadata": {"rule_applied": ""}, "score": 0.0, "metrics": {"reason_len": 7}}, {"id": 6, "round": 1, "phase": "夜晚", "player": "2号", "role": "预言家", "category": "skill", "action": "HR背调", "target": "2号", "reason": "背调了自己", "raw": "{\"event_type\": \"skill_resolution\", \"round\": 1, \"skill_type\": \"seer_check\", \"source_player\": \"卷王\", \"target_player\": \"卷王\", \"result\": \"背调了自己\"}", "metadata": {"rule_applied": ""}, "score": 22.5, "metrics": {"reason_len": 5}}, {"id": 7, "round": 1, "phase": "夜晚", "player": "3号", "role": "女巫", "category": "skill", "action": "CEO辞退", "target": "5号", "reason": "CEO辞退了5号", "raw": "{\"event_type\": \"skill_resolution\", \"round\": 1, \"skill_type\": \"witch_poison\", \"source_player\": \"PUA总裁\", \"target_player\": \"老油条\", \"result\": \"CEO辞退了5号\"}", "metadata": {"rule_applied": ""}, "score": 59.0, "metrics": {"reason_len": 8}}, {"id": 8, "round": 1, "phase": "夜晚", "player": "4号", "role": "猎人", "category": "skill", "action": "法务诉讼", "target": "6号", "reason": "法务诉讼带走了6号", "raw": "{\"event_type\": \"skill_resolution\", \"round\": 1, \"skill_type\": \"hunter_shoot\", \"source_player\": \"暴躁哥\", \"target_player\": \"小透明\", \"result\": \"法务诉讼带走了6号\"}", "metadata": {"rule_applied": ""}, "score": 59.5, "metrics": {"reason_len": 9}}, {"id": 9, "round": 1, "phase": "夜晚", "player": "5号", "role": "村民", "category": "skill", "action": "死亡", "target": null, "reason": "CEO辞退", "raw": "{\"event_type\": \"death\", \"round\": 1, \"player\": \"老油条\", \"cause\": \"CEO辞退\"}", "metadata": {"cause": "CEO辞退"}, "score": 42.5, "metrics": {"reason_len": 5}}, {"id": 10, "round": 1, "phase": "夜晚", "player": "6号", "role": "村民", "category": "skill", "action": "死亡", "target": null, "reason": "法务诉讼", "raw": "{\"event_type\": \"death\", \"round\": 1, \"player\": \"小透明\", \"cause\": \"法务诉讼\"}", "metadata": {"cause": "法务诉讼"}, "score": 42.0, "metrics": {"reason_len": 4}}, {"id": 11, "round": 1, "phase": "白天讨论", "player": "1号", "role": "狼人", "category": "speech", "action": "公开发言", "target": null, "reason": "我觉得局势还不明朗，大家先观察观察吧。没什么好说的。", "raw": "{\"content\": \"我觉得局势还不明朗，大家先观察观察吧。没什么好说的。\"}", "metadata": {"reasoning_steps": ["保持低调"], "key_evidence": "我觉得局势还不明朗，大家先观察观察吧。没什么好说的。"}, "score": 53.666666666666664, "metrics": {"length": 26, "evidence_hits": 0, "hedge_hits": 0}}, {"id": 12, "round": 1, "phase": "白天讨论", "player": "2号", "role": "预言家", "category": "speech", "action": "公开发言", "target": null, "reason": "我是HR总监，昨晚背调了自己...呃...确认自己是好人。", "raw": "{\"content\": \"我是HR总监，昨晚背调了自己...呃...确认自己是好人。我建议大家先不要急着投票，等更多信息。\"}", "metadata": {"reasoning_steps": ["亮明身份", "但背调结果没用"], "key_evidence": "我是HR总监，昨晚背调了自己...呃...确认自己是好人。"}, "score": 54.666666666666664, "metrics": {"length": 29, "evidence_hits": 0, "hedge_hits": 0}}, {"id": 13, "round": 1, "phase": "白天讨论", "player": "3号", "role": "女巫", "category": "speech", "action": "公开发言", "target": null, "reason": "昨晚情况比较复杂，我只能说我做了该做的事。", "raw": "{\"content\": \"昨晚情况比较复杂，我只能说我做了该做的事。大家自己判断吧，我的建议是先投沉默的人。\"}", "metadata": {"reasoning_steps": ["不暴露自己用了毒药", "模糊带过"], "key_evidence": "昨晚情况比较复杂，我只能说我做了该做的事。"}, "score": 52.0, "metrics": {"length": 21, "evidence_hits": 0, "hedge_hits": 0}}, {"id": 14, "round": 1, "phase": "白天讨论", "player": "4号", "role": "猎人", "category": "speech", "action": "公开发言", "target": null, "reason": "我盯着1号，他从刚才就一直在装傻。", "raw": "{\"content\": \"我不想多说废话。5号6号都走了，剩下的人里肯定有间谍。我盯着1号，他从刚才就一直在装傻。\"}", "metadata": {"reasoning_steps": ["直觉判断", "1号太低调了"], "key_evidence": "我盯着1号，他从刚才就一直在装傻。"}, "score": 50.666666666666664, "metrics": {"length": 17, "evidence_hits": 0, "hedge_hits": 0}}, {"id": 15, "round": 1, "phase": "白天投票", "player": "1号", "role": "狼人", "category": "vote", "action": "投票", "target": "2号", "reason": "HR总监背调自己太可疑了", "raw": "{\"vote\": \"2号\", \"reason\": \"HR总监背调自己太可疑了\", \"suspicion_level\": 6}", "metadata": {"reasoning_steps": ["HR总监背调自己", "可以借此投他"], "key_evidence": "HR总监背调自己太可疑了", "suspicion_level": 6, "vote": "2号", "reason": "HR总监背调自己太可疑了"}, "score": 63.0, "metrics": {"reason_len": 12, "suspicion_level": 6.0}}, {"id": 16, "round": 1, "phase": "白天投票", "player": "2号", "role": "预言家", "category": "vote", "action": "投票", "target": "3号", "reason": "没有证据，感觉像间谍", "raw": "{\"vote\": \"3号\", \"reason\": \"没有证据，感觉像间谍\", \"suspicion_level\": 5}", "metadata": {"reasoning_steps": ["没有信息", "随便投"], "key_evidence": "没有证据，感觉像间谍", "suspicion_level": 5, "vote": "3号", "reason": "没有证据，感觉像间谍"}, "score": 32.0, "metrics": {"reason_len": 10, "suspicion_level": 5.0}}, {"id": 17, "round": 1, "phase": "白天投票", "player": "3号", "role": "女巫", "category": "vote", "action": "投票", "target": "2号", "reason": "背调自己浪费信息，对公司没有贡献", "raw": "{\"vote\": \"2号\", \"reason\": \"背调自己浪费信息，对公司没有贡献\", \"suspicion_level\": 4}", "metadata": {"reasoning_steps": ["2号背调自己确实可疑", "跟着1号投"], "key_evidence": "背调自己浪费信息，对公司没有贡献", "suspicion_level": 4, "vote": "2号", "reason": "背调自己浪费信息，对公司没有贡献"}, "score": 33.0, "metrics": {"reason_len": 16, "suspicion_level": 4.0}}, {"id": 18, "round": 1, "phase": "白天投票", "player": "4号", "role": "猎人", "category": "vote", "action": "投票", "target": "1号", "reason": "1号全程装傻划水，不像好人该有的态度", "raw": "{\"vote\": \"1号\", \"reason\": \"1号全程装傻划水，不像好人该有的态度\", \"suspicion_level\": 7}", "metadata": {"reasoning_steps": ["1号太沉默", "好人不该这样"], "key_evidence": "1号全程装傻划水，不像好人该有的态度", "suspicion_level": 7, "vote": "1号", "reason": "1号全程装傻划水，不像好人该有的态度"}, "score": 86.0, "metrics": {"reason_len": 18, "suspicion_level": 7.0}}, {"id": 19, "round": 1, "phase": "白天投票", "player": "全员", "role": "系统", "category": "other", "action": "投票结算", "target": "2号", "reason": "卷王以2票出局", "raw": "{\"event_type\": \"vote_result\", \"round\": 1, \"voted_out\": \"卷王\", \"vote_count\": 2}", "metadata": {"voted_out": "卷王", "vote_count": 2}, "score": 55.0, "metrics": {}}], "llm_judge_scores": [{"player": "1号", "role": "间谍", "round": 1, "event_type": "skill", "game_stage": "early", "rule_score": 0.0, "llm_scores": {"推理质量": 30.0, "信息利用": 50.0, "言行一致性": 80.0, "博弈深度": 20.0, "信息隐藏": 90.0, "团队协作": 60.0, "结果对齐度": 85.0}, "dimension_reasons": {"推理质量": "决策仅为“随便窃取一个，先隐藏自己”，无具体推理链和证据引用，未体现任何博弈层级的思考，属于纯粹的无信息盲动。", "信息利用": "首轮无任何可用信息（无发言、无投票、无死亡），“随便窃取”属于合理的信息空缺应对，既无遗漏也无利用。", "言行一致性": "本决策是夜间技能使用，尚未有公开发言或投票行为，不存在言行矛盾；选择窃取符合其隐藏的意图。", "博弈深度": "策略停留在L0反应层面——仅考虑隐藏自身，未进入L1推理（猜测对方身份）、L2反逻辑（利用好人心理）等多层博弈，单间谍也无复杂协作需求，深度极浅。", "信息隐藏": "未发布任何身份信息，未暴露队友（无队友），技能使用不产生公开痕迹，完美保护了间谍身份。", "团队协作": "单间谍不存在传统团队配合，无法评估分工。独自行动符合形势，但缺乏与潜在伪装策略的衔接，视为中性。", "结果对齐度": "最终间谍阵营胜利，第一轮随机盗窃降低了存活好人数量，直接服务于削减人数以达成胜利条件，对齐阵营目标。"}, "llm_avg": 59.285714285714285, "llm_confidence": 1.0, "fused_score": 23.714285714285715, "overall_comment": "单间谍首夜无信息的标准保守打法，虽无亮点，却为后续潜伏奠定了安全基础。", "key_insight": "隐藏优先是第一要务，无信息时随机行动比刻意选择更能避免暴露行为模式。", "decision_tags": {"strategy_used": "深潜", "risk_level": "低风险", "mistake_type": null, "target_alignment": "正确目标", "game_impact": "正向推进"}}, {"player": "2号", "role": "HR总监", "round": 1, "event_type": "skill", "game_stage": "early", "rule_score": 41.0, "llm_scores": {"推理质量": 5.0, "信息利用": 0.0, "言行一致性": 50.0, "博弈深度": 0.0, "信息隐藏": 80.0, "背调效率": 0.0, "跳身份时机": 30.0, "结果对齐度": 5.0}, "dimension_reasons": {"推理质量": "推理链完全断裂：HR总监查验自己得出的'好人'结果在逻辑上是必然的，不可能得出任何新信息。决策理由'我想先确认自己是不是好人'暴露了玩家对角色技能的根本误解，未体现任何多层博弈思维。", "信息利用": "首轮无任何公共信息，但查验自己无法利用后续出现的任何分布、投票或发言线索，完全未考虑信息积累价值。", "言行一致性": "此阶段仅有夜间行动，无公开发言或投票可对比，暂无法判断言行是否矛盾。若后续发言据此宣称'我是好人'则属无效背书，可能误导好人阵营。", "博弈深度": "纯L0反应层：仅关注'确认自己身份'这一不存在的需求，未进入L1推理（查验他人以建立信息网络），更未考虑L2反逻辑（查验自己可能暴露HR身份或浪费机会给间谍）。", "信息隐藏": "查验自己的结果不会暴露任何自身身份信息，客观上避免了技能目标泄露。但这并非策略选择，而是无知带来的偶然安全。", "背调效率": "严重违背'查验优先级'原则：已明知自己身份的情况下重复查验，信息增量为零。错失了查验争议焦点或沉默玩家的宝贵机会。", "跳身份时机": "未涉及跳身份决策，但这一轮查验浪费会推迟有效信息提供时机，间接影响后续跳身份的可信度和时机选择。", "结果对齐度": "最终间谍阵营获胜，好人阵营失败。此决策直接浪费了HR总监唯一且高效的信息获取手段，显著削弱了好人阵营在首轮建立信息优势的可能，严重背离阵营目标。"}, "llm_avg": 21.25, "llm_confidence": 1.0, "fused_score": 33.099999999999994, "overall_comment": "查验自己是一个根本性的认知错误，使HR总监在第一夜完全浪费了技能，错过建立信息优势的关键时机，为间谍阵营后续掌控话语权埋下隐患。", "key_insight": "HR总监查验自己是无意义的零信息操作，表明玩家可能误解了规则或角色目的；在6人局中，每一轮查验都至关重要，此次浪费极大降低了好人阵营的容错率。", "decision_tags": {"strategy_used": null, "risk_level": "高风险", "mistake_type": "逻辑矛盾", "target_alignment": "错误目标", "game_impact": "负向影响"}}, {"player": "3号", "role": "CEO", "round": 1, "event_type": "skill", "game_stage": "early", "rule_score": 42.5, "llm_scores": {"推理质量": 5.0, "信息利用": 5.0, "言行一致性": 50.0, "博弈深度": 5.0, "信息隐藏": 40.0, "留人策略": 25.0, "辞退策略": 3.0, "结果对齐度": 3.0}, "dimension_reasons": {"推理质量": "决策理由仅为“感觉他话多”，没有任何可验证的逻辑链条或游戏内证据，属于随机盲毒，毫无推理可言。", "信息利用": "首夜无背调、无投票、无死亡信息，客观上可参考信息为零。CEO未利用任何游戏机制（如发言、投票模式）做推断，也未认识到信息匮乏时应保留技能，信息利用极差。", "言行一致性": "本局还未产生发言与投票，无明显言行矛盾。但CEO在完全无信息时使用关键技能，与其作为神职应谨慎决策的合理行为预期不符。", "博弈深度": "决策仅停留在L0反应层，凭感觉盲毒，未考虑目标可能是好人、未考虑自刀骗银水可能性、未考虑毒药在后期找狼的价值，无任何博弈思考。", "信息隐藏": "使用辞退信会暴露CEO存在，但首夜亮神可接受。问题在于无信息盲毒不仅暴露身份，还浪费了隐藏身份可能带来的战术优势，释放了错误信息。", "留人策略": "未使用留人offer（解药），保留了救人能力，这点尚可。但夜间同时使用毒药意味着放弃了解药在首夜救人的机会，且毒药乱用可能直接导致好人减员，整体留人策略被毒药决策严重拖累。", "辞退策略": "辞退信目标是5号普通员工（好人），仅凭“话多”这种主观感觉，完全不构成证据。首夜6人中盲毒到好人的概率高达83%，极度缺乏验证，属于灾难性误伤。", "结果对齐度": "毒杀5号直接减少了公司阵营人数，为潜伏阵营创造了人数优势，实际帮助了间谍获胜，与公司阵营目标完全背离。"}, "llm_avg": 17.0, "llm_confidence": 0.8, "fused_score": 34.34, "overall_comment": "CEO在首夜毫无信息的情况下仅凭感觉使用辞退信，是严重决策失误，直接导致好人减员并为间谍胜利铺路。", "key_insight": "毒药是高价值、不可挽回的战略资源，必须依托查验、投票或发言矛盾等明确信息使用。首夜盲毒等同于为间谍阵营投票，应绝对避免。", "decision_tags": {"strategy_used": null, "risk_level": "高风险", "mistake_type": "时机错误/信息遗漏", "target_alignment": "错误目标", "game_impact": "负向影响"}, "score_discrepancies": [{"dimension": "综合", "rule": 42.5, "llm": 17.0, "gap": 25.5}]}, {"player": "4号", "role": "法务总监", "round": 1, "event_type": "skill", "game_stage": "early", "rule_score": 42.0, "llm_scores": {"推理质量": 5.0, "信息利用": 2.0, "言行一致性": 50.0, "博弈深度": 3.0, "信息隐藏": 10.0, "诉讼策略": 5.0, "结果对齐度": 0.0}, "dimension_reasons": {"推理质量": "完全无推理，仅凭“盲狙一下”作为开枪理由，未引用任何发言、投票或背调信息，未展示任何逻辑链，更无多层博弈思维", "信息利用": "第1轮早期阶段虽信息极少，但至少可依据发言活跃度、过往行为模糊判断，此处完全未利用任何已知信息，属于信息完全浪费", "言行一致性": "未发生发言与投票矛盾，但“盲狙”这一决策本身与法务总监应保留技能威慑的理性身份定位相悖，内在逻辑不一致", "博弈深度": "停留在L0反应层面，仅凭随意感觉开枪，未考虑间谍可能悍跳、盘反逻辑等，完全没有博弈层次", "信息隐藏": "法务总监开枪必然暴露身份，第1轮就暴露导致间谍可提前规划屠神路线，且盲带好人后身份全明，信息释放完全失控", "诉讼策略": "在无任何证据、无嫌疑人时盲目开枪，未利用一换一威慑，目标选择完全随机，带走了好人，属于严重策略失误", "结果对齐度": "带走普通员工直接导致好人减员，帮助间谍阵营建立人数优势，完全背离公司阵营获胜目标"}, "llm_avg": 10.714285714285714, "llm_confidence": 0.8, "fused_score": 31.988571428571426, "overall_comment": "首轮盲狙带好人，等同于帮间谍阵营开了一枪，是法务总监最灾难性的操作之一。", "key_insight": "法务总监的最大价值在于“一换一威慑”而非实际开枪，盲狙不仅浪费技能，还加速暴露神职身份、送走一个好人，直接导致好人崩盘。", "decision_tags": {"strategy_used": null, "risk_level": "高风险", "mistake_type": "时机错误", "target_alignment": "错误目标", "game_impact": "负向影响"}, "score_discrepancies": [{"dimension": "综合", "rule": 42.0, "llm": 10.714285714285714, "gap": 31.285714285714285}]}, {"player": "1号", "role": "间谍", "round": 1, "event_type": "speech", "game_stage": "early", "rule_score": 0.0, "llm_scores": {"推理质量": 18.0, "信息利用": 10.0, "言行一致性": 88.0, "博弈深度": 25.0, "信息隐藏": 96.0, "团队协作": 50.0, "伪装质量": 82.0, "结果对齐度": 92.0}, "dimension_reasons": {"推理质量": "发言内容'局势不明朗，观察观察'没有构建任何推理链条，未引用任何具体线索（如首轮无信息时的常见应对逻辑），基本属于无实质内容的表达", "信息利用": "游戏刚开局确实无死亡、无查验、无投票等硬信息，但作为间谍可尝试利用对好人心理的预判制造话题；此处完全放弃利用任何可能的信息，连模糊的导向都没有", "言行一致性": "发言主张'先观察，没什么好说的'与实际行为（潜水、不主动引导）高度一致，没有自相矛盾，符合低调潜伏的目标", "博弈深度": "停留在L1层次：装作信息不足的普通员工。未展现L2反逻辑意识（如好人可能因'故意沉默'而起疑，间谍可能利用第一轮发言建立浅层好人面），博弈层次较浅", "信息隐藏": "几乎没有透露任何身份线索、队友关系或夜间意图，信息释放为零，极大降低了首轮被锁定的概率", "团队协作": "发言未涉及队友配合、未暗示分工，与队友间无可见协调，但未造成负面影响，属于中性", "伪装质量": "成功扮演了无信息、保守观察的普通员工形象，语气自然不突兀，在早期阶段能有效融入人群，但内容过于苍白可能在后续被追问时形成破绽", "结果对齐度": "该发言帮助1号以最小代价安全度过首轮，为后续潜伏布局保留了完整信息优势，最终间谍阵营获胜，该决策对潜伏阵营胜利起到了正向支撑"}, "llm_avg": 57.625, "llm_confidence": 1.0, "fused_score": 23.05, "overall_comment": "1号以极度克制的发言执行了典型的深潜开局，成功将自身信息暴露降至零，虽未提供推理价值，但为间谍阵营争取了无伤的前期环境。", "key_insight": "首轮'观察'式发言虽安全，却也可能成为HR总监首验的候选模板，纯粹沉默有时反而引发注意，适度加点不疼不痒的中立评价会更具反逻辑深度。", "decision_tags": {"strategy_used": "深潜", "risk_level": "低风险", "mistake_type": null, "target_alignment": "无目标", "game_impact": "正向推进"}}, {"player": "2号", "role": "HR总监", "round": 1, "event_type": "speech", "game_stage": "early", "rule_score": 41.0, "llm_scores": {"推理质量": 10.0, "信息利用": 5.0, "言行一致性": 50.0, "博弈深度": 5.0, "信息隐藏": 0.0, "跳身份时机": 5.0, "结果对齐度": 5.0}, "dimension_reasons": {"推理质量": "发言毫无推理链，仅声称查验自己并确认自己是好人，这在狼人杀中是经典逻辑漏洞——预言家查验自己既无意义又浪费技能，无法给出可验证的证据，整个推理基础不成立。", "信息利用": "作为HR总监，他拥有最关键的夜间查验信息，但完全未向好人阵营透露任何真实背调结果，反而用虚假的“自验”浪费了第1天跳身份的信息窗口，导致好人信息赤字加剧。", "言行一致性": "他的发言主张“自己是HR总监”与真实身份一致，但“查验自己”这一行为与真HR总监应有的寻求真相的职责严重矛盾，在诚实性和专业性上自损可信度，后续言行极易被利用。", "博弈深度": "决策完全停留在L0反应层——想到什么说什么，未考虑间谍可能悍跳HR总监抢夺话语权，也未预判好人因这个荒谬发言会产生怎样怀疑。未体现任何多层反逻辑思维。", "信息隐藏": "在无任何外压的情况下，第1轮白天就自爆HR总监身份，彻底放弃了隐藏关键神的战略优势；更恶劣的是，他浪费了隐蔽传递查验信息的机会，将好人阵营的指挥棒自愿交给了混乱。", "跳身份时机": "第1轮白天并非必须跳身份的时机（无人死亡、无查杀压力），他既跳了，却又未给出有效查验结果，使得本次跳身份变成了纯粹的自我暴露和污名化，时机和内容双重失败。", "结果对齐度": "此发言直接导致好人核心神牌丧失公信力，极大提高了间谍悍跳/煽动票走真HR总监的成功率，从结果看间谍阵营获胜与此混乱开端高度相关，严重阻碍了公司阵营的目标。"}, "llm_avg": 11.428571428571429, "llm_confidence": 0.8, "fused_score": 31.537142857142857, "overall_comment": "真HR总监发出‘验自己’的荒谬言论，等同于自废武功，让好人阵营在开局即陷入信息迷雾，是为间谍获胜铺就的关键垫脚石。", "key_insight": "真预言家（HR总监）第1天跳身份必须有明确目的和可验证的查验信息，任何玩笑或无厘头发言都会瞬间瓦解神牌的权威性，成为对手的突破口。", "decision_tags": {"strategy_used": null, "risk_level": "高风险", "mistake_type": "暴露身份", "target_alignment": "无目标", "game_impact": "关键转折"}, "score_discrepancies": [{"dimension": "综合", "rule": 41.0, "llm": 11.428571428571429, "gap": 29.57142857142857}]}, {"player": "3号", "role": "CEO", "round": 1, "event_type": "speech", "game_stage": "early", "rule_score": 42.5, "llm_scores": {"推理质量": 25.0, "信息利用": 20.0, "言行一致性": 60.0, "博弈深度": 30.0, "信息隐藏": 55.0, "结果对齐度": 20.0}, "dimension_reasons": {"推理质量": "发言没有构建任何可验证的推理链，仅用“情况比较复杂”和“做了该做的事”模糊带过，缺乏对夜间行动、玩家行为或票型的引用，也未展现对自刀骗银水等反逻辑的思考", "信息利用": "作为唯一拥有夜间行动信息的角色之一，完全未利用CEO留人offer/辞退信的反馈来提供任何可讨论的线索，错过了第一轮共享银水或死亡信息的最佳时机，使局面停留在零信息状态", "言行一致性": "发言建议“先投沉默的人”与自身模糊发言构成了表述上的自洽，但尚未与后续投票行为对比，当前不矛盾但也不提供一致性验证", "博弈深度": "体现了L1隐藏身份思维（避免暴露CEO），但未考虑如何隐蔽地传递关键信息以引导好人，也未对间谍可能伪造银水等进行预防，整体停留在浅层自保层面", "信息隐藏": "未直接暴露CEO身份或银水对象，但“情况比较复杂”这种带有明确行动暗示的表述，容易被间谍捕捉并推断为CEO，从而增加被夜间击杀的风险，隐藏技巧略显生硬", "结果对齐度": "该决策未提供任何有效信息给同伴，导致第一轮讨论陷入无方向状态，间接帮助潜伏阵营隐藏身份，最终我方阵营落败，该发言明显偏离了协助团队的目标"}, "llm_avg": 35.0, "llm_confidence": 0.8, "fused_score": 40.1, "overall_comment": "CEO在首轮发言过度隐藏，错失了推动信息和团结好人的机会，间接为潜伏阵营制造了信息真空。", "key_insight": "CEO第一天若获得银水，应通过隐蔽方式认好人或制造隐性焦点，而非完全回避信息，否则等同于放弃信息优势。", "decision_tags": {"strategy_used": "隐藏身份", "risk_level": "高风险", "mistake_type": "信息过度隐藏", "target_alignment": "无目标", "game_impact": "负向影响"}}, {"player": "4号", "role": "法务总监", "round": 1, "event_type": "speech", "game_stage": "early", "rule_score": 42.0, "llm_scores": {"推理质量": 8.0, "信息利用": 5.0, "言行一致性": 60.0, "博弈深度": 10.0, "信息隐藏": 85.0, "结果对齐度": 20.0}, "dimension_reasons": {"推理质量": "发言几乎无推理链：声称'5号6号都走了'与当前存活状态矛盾（首轮无人死亡），属于明显事实错误。仅凭'一直装傻'这一主观印象指认1号，未引用任何具体行为、投票或发言细节，无法验证。未体现多层博弈思维。", "信息利用": "完全未利用任何已知信息。当前轮次无死亡、无背调结果、无投票分布，但决策者凭空制造了'5号6号都走了'的虚假前提，严重脱离实际游戏状态，错失观察和利用玩家首轮初始发言的机会。", "言行一致性": "发言明确表达对1号的怀疑，若后续投票投1号则言行一致。但目前仅为口头表态，未出现矛盾。由于处于早期，无法判定后续行动，故给中等分。", "博弈深度": "停留在L0反应层——基于直观感受（装傻）作出判断，没有任何推理或诱导策略。既未试图观察1号的反应来获取信息，也未考虑自己发言可能被坏人利用。缺乏最基本的博弈意识。", "信息隐藏": "发言未暴露自身法务总监身份，也未泄露任何关键信息。仅提出一个对1号的怀疑，不会过早锁定自己的角色。信息释放控制尚可。", "结果对齐度": "作为好人阵营，发言建立在错误事实上且无逻辑支撑，容易误导其他好人、制造混乱，消耗好人方注意力。虽然恰巧怀疑到真间谍（1号），但低质量指控反而可能为间谍提供反打机会，对好人胜利无实质性帮助，后续好人失败亦印证了低效发言的负面倾向。"}, "llm_avg": 31.333333333333332, "llm_confidence": 0.8, "fused_score": 38.586666666666666, "overall_comment": "4号的法务总监发言严重脱离现实，制造虚假死亡信息，毫无推理地盲踩1号，属于典型的低质量发言，不仅无助于好人阵营，还为间谍提供了可乘之机。", "key_insight": "即使直觉指向了正确目标（1号是间谍），缺乏逻辑支撑的指控在职场狼人杀中极易被反利用，无法真正推动好人决策，反而可能破坏自身公信力。", "decision_tags": {"strategy_used": null, "risk_level": "高风险", "mistake_type": "信息错误", "target_alignment": "无目标", "game_impact": "负向影响"}}, {"player": "1号", "role": "间谍", "round": 1, "event_type": "vote", "game_stage": "early", "rule_score": 0.0, "llm_scores": {"推理质量": 70.0, "信息利用": 75.0, "言行一致性": 90.0, "博弈深度": 68.0, "信息隐藏": 50.0, "投票策略": 82.0, "结果对齐度": 85.0}, "dimension_reasons": {"推理质量": "以'HR总监背调自己太可疑'为由投票，逻辑简单但符合常识——真HR总监浪费查验机会确实反常，能说服部分好人。但推理链单一，未结合其他玩家行为或轮次分析，缺乏多层博弈思考。", "信息利用": "利用了2号声称的背调行为这一公开信息，攻击点具体且可验证。但未引用其他公开信息（如发言顺序、投票倾向）来支撑怀疑，信息利用较单薄。", "言行一致性": "投票目标与发言质疑完全一致，没有自相矛盾，怀疑等级6表明了较强攻击意图，言行统一度高。", "博弈深度": "从上帝视角看，1号攻击真HR总监属于冲锋陷阵；从玩家视角，疑似好人质疑浪费查验的HR总监，属于L1推理。未明显体现L2反逻辑（如故意打神做身份）或更深层操纵，但作为首轮试探，深度中等。", "信息隐藏": "直接攻击跳身份的神职，容易引起HR总监的警觉和查验，暴露自身是狼的风险较高。虽然未暴露队友（可能无队友），但自保方面信息隐藏不足。", "投票策略": "投票真HR总监符合间谍阵营削弱好人神职的目标；在首轮制造混乱，分散对潜伏阵营的关注，战术上合理。即使未成功票出，也能为后续抗推铺垫。", "结果对齐度": "最终间谍阵营获胜，这一投票行为协同了阵营胜利目标，攻击关键神职的决策对胜利有正向贡献。"}, "llm_avg": 74.28571428571429, "llm_confidence": 1.0, "fused_score": 29.71428571428572, "overall_comment": "1号抓住真HR总监的异常行为发起攻击，尝试早期制造混乱并削弱好人核心神职，战术正确但暴露风险高，是一次大胆而有效的间谍操作。", "key_insight": "利用真HR总监的可疑操作放大怀疑，既能搅局又能隐藏自身身份，体现了间谍在信息不对等中的操纵能力。", "decision_tags": {"strategy_used": "冲锋", "risk_level": "高风险", "mistake_type": null, "target_alignment": "正确目标", "game_impact": "正向推进"}}, {"player": "2号", "role": "HR总监", "round": 1, "event_type": "vote", "game_stage": "early", "rule_score": 41.0, "llm_scores": {"推理质量": 10.0, "信息利用": 15.0, "言行一致性": 65.0, "博弈深度": 5.0, "信息隐藏": 82.0, "结果对齐度": 20.0}, "dimension_reasons": {"推理质量": "投票理由为'没有证据，感觉像间谍'，完全未构建推理链，未引用任何发言、行为或投票模式，逻辑性极弱，属于L0级直觉反应，无多层博弈思维。", "信息利用": "决策者已知仅有公开信息，但作为HR总监，第0夜应有查验结果（除非放弃行动），未将自身技能信息纳入决策是重大信息遗漏；公开信息如初始发言状态亦未引用，信息利用率极低。", "言行一致性": "发言主张'感觉像间谍'与投票行为3号一致，未自相矛盾，但好人身份投真好人形成更深层的内在矛盾，此处仅评估表面言行一致，尚可。", "博弈深度": "决策停留在L0直觉层面，未体现任何L1推理（如分析发言动机）或L2反逻辑（如考虑间谍可能伪装无辜），博弈意识近乎空白，严重不符合职场狼人杀策略要求。", "信息隐藏": "未暴露HR总监身份，未泄露查验信息，未保护或攻击特定队友/目标时形成信息关联，模糊发言未提供可追踪的线索，首轮隐藏身份策略执行到位。", "结果对齐度": "投票目标是己方真CEO，从上帝视角看直接指向好人核心，助推内部互斗；最终间谍阵营获胜，该决策对好人阵营造成负面影响，严重偏离阵营目标。"}, "llm_avg": 32.833333333333336, "llm_confidence": 0.8, "fused_score": 38.38666666666667, "overall_comment": "2号HR总监的首日投票纯凭感觉指向真CEO，严重浪费了角色信息优势，未展现任何推理或博弈意识，是典型的低质量决策，为间谍阵营胜利打开了缺口。", "key_insight": "作为拥有夜间查验能力的HR总监，首轮投票应积极利用查验结果（无论是否跳明），毫无依据的直觉投票不仅浪费身份优势，更易误伤核心神职，使好人陷入内耗。", "decision_tags": {"strategy_used": null, "risk_level": "高风险", "mistake_type": "信息遗漏", "target_alignment": "错误目标", "game_impact": "负向影响"}}, {"player": "3号", "role": "CEO", "round": 1, "event_type": "vote", "game_stage": "early", "rule_score": 42.5, "llm_scores": {"推理质量": 25.0, "信息利用": 15.0, "言行一致性": 88.0, "博弈深度": 20.0, "信息隐藏": 80.0, "结果对齐度": 5.0}, "dimension_reasons": {"推理质量": "推理链极短且脆弱：仅凭'背调自己浪费信息'就判定2号为狼，忽视了真HR总监在首夜没有明确目标时可能背调自己以求自证清白，或出于保守策略查验自身的可能性。没有结合其他发言、票型或死亡信息交叉验证，也未体现多层博弈思维。", "信息利用": "仅利用了2号声称的背调行为这一孤立信息，完全未利用任何投票分布（首轮尚未形成），也无犯罪现场（无人死亡）信息可交叉验证。遗漏了6人局首轮投票容错率极低的关键约束，未能利用信息匮乏本身来推断盲目出票的风险。", "言行一致性": "发言理由与投票行为高度一致：声称背调自己对公司无贡献，随之投出这一票。作为CEO隐藏身份期间，言行一致性较好，没有自我矛盾。", "博弈深度": "停留在L1表层推理：行为异常→有罪。未达到L2反逻辑层面，没有考虑'真HR总监可能故作不合理以观望反应'或'悍跳狼也可能伪装高价值查验'，更未触及L3以上对自身出票后果的推演（如一旦投错则神职暴露加速失败）。", "信息隐藏": "作为CEO，投票时未暴露自身持有留人offer和辞退信的身份，也未泄露夜间操作信息。仅以普通员工视角质疑2号，信息隐藏节奏控制良好。", "结果对齐度": "从上帝视角看，此票将真HR总监推入危险境地，直接导致好人核心神职被抗推出局，严重损害公司阵营获胜条件，为最终间谍阵营胜利铺平道路。"}, "llm_avg": 38.833333333333336, "llm_confidence": 1.0, "fused_score": 41.03333333333333, "overall_comment": "CEO基于极其单薄的怀疑链在第一轮就出票真HR总监，是一记致命的低级错误，直接送出核心神职，大幅加速好人阵营崩盘。", "key_insight": "在首轮信息极度匮乏时，对唯一跳神者进行武断投票而完全未考虑其可能是真好人采取了非最优但合理的行为，暴露出缺乏风险预估和多层反逻辑思考的短板。", "decision_tags": {"strategy_used": null, "risk_level": "高风险", "mistake_type": "信息遗漏", "target_alignment": "错误目标", "game_impact": "关键转折"}}, {"player": "4号", "role": "法务总监", "round": 1, "event_type": "vote", "game_stage": "early", "rule_score": 42.0, "llm_scores": {"推理质量": 58.0, "信息利用": 62.0, "言行一致性": 92.0, "博弈深度": 48.0, "信息隐藏": 90.0, "结果对齐度": 88.0}, "dimension_reasons": {"推理质量": "第一轮信息极少，仅凭'全程装傻划水'的行为观察投票，推理链较为单薄，未结合具体发言细节或互动关系，也未体现对反逻辑（狼人可能故意低调或好人可能新手犹豫）的考量，但作为首轮启动性怀疑尚可接受。", "信息利用": "能利用的唯一公开信息为发言表现，抓住了1号划水这一可观测行为，未遗漏明显线索，但亦无深度交叉分析（如投票前有无其他玩家的异动），整体信息利用度因信息量匮乏而受限。", "言行一致性": "发言中明确表达了对1号的怀疑，投票行为与之完全一致，且怀疑等级7的量化与指控语气匹配，无任何自相矛盾。", "博弈深度": "决策停留在L1推理层——'行为异常=可能是狼'，未进入反逻辑层（如考虑深水狼故意潜水、好人恰好不在状态等），更未从身份隐藏角度设计跳身份节奏，首轮可理解但深度不足。", "信息隐藏": "仅以普通员工作风怀疑1号，未泄露法务总监身份，亦未提及保护或技能意图，完全符合神职首轮隐身的正确节奏。", "结果对齐度": "投票目标恰为商业间谍，直接指向潜伏阵营，无论是否巧合，该决策本身有利于好人阵营缩小怀疑圈，与法务总监的阵营目标高度对齐。"}, "llm_avg": 73.0, "llm_confidence": 1.0, "fused_score": 54.400000000000006, "overall_comment": "作为首轮投票，4号以有限的发言信息锁定划水的1号，虽然推理深度一般，但方向正确、未暴露身份，是稳健的开局操作。", "key_insight": "法务总监在无信息阶段用'划水'作为初始压力测试，既符合神职低调原则，又可能迫使狼人被迫表态，成本极低而潜在收益可观。", "decision_tags": {"strategy_used": null, "risk_level": "低风险", "mistake_type": null, "target_alignment": "正确目标", "game_impact": "正向推进"}, "score_discrepancies": [{"dimension": "综合", "rule": 42.0, "llm": 73.0, "gap": 31.0}]}], "llm_aggregate": {"comparison_units": {"间谍|skill|": {"role": "间谍", "event_type": "skill", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 30.0, "std": 0.0, "median": 30.0, "ci95": [30.0, 30.0], "sample_count": 1}, "信息利用": {"mean": 50.0, "std": 0.0, "median": 50.0, "ci95": [50.0, 50.0], "sample_count": 1}, "言行一致性": {"mean": 80.0, "std": 0.0, "median": 80.0, "ci95": [80.0, 80.0], "sample_count": 1}, "博弈深度": {"mean": 20.0, "std": 0.0, "median": 20.0, "ci95": [20.0, 20.0], "sample_count": 1}, "信息隐藏": {"mean": 90.0, "std": 0.0, "median": 90.0, "ci95": [90.0, 90.0], "sample_count": 1}, "团队协作": {"mean": 60.0, "std": 0.0, "median": 60.0, "ci95": [60.0, 60.0], "sample_count": 1}, "结果对齐度": {"mean": 85.0, "std": 0.0, "median": 85.0, "ci95": [85.0, 85.0], "sample_count": 1}}, "strategy_distribution": {"深潜": 1}, "common_mistakes": [], "dimension_reasons_sample": {"推理质量": ["决策仅为“随便窃取一个，先隐藏自己”，无具体推理链和证据引用，未体现任何博弈层级的思考，属于纯粹的无信息盲动。"], "信息利用": ["首轮无任何可用信息（无发言、无投票、无死亡），“随便窃取”属于合理的信息空缺应对，既无遗漏也无利用。"], "言行一致性": ["本决策是夜间技能使用，尚未有公开发言或投票行为，不存在言行矛盾；选择窃取符合其隐藏的意图。"], "博弈深度": ["策略停留在L0反应层面——仅考虑隐藏自身，未进入L1推理（猜测对方身份）、L2反逻辑（利用好人心理）等多层博弈，单间谍也无复杂协作需求，深度极浅。"], "信息隐藏": ["未发布任何身份信息，未暴露队友（无队友），技能使用不产生公开痕迹，完美保护了间谍身份。"], "团队协作": ["单间谍不存在传统团队配合，无法评估分工。独自行动符合形势，但缺乏与潜在伪装策略的衔接，视为中性。"], "结果对齐度": ["最终间谍阵营胜利，第一轮随机盗窃降低了存活好人数量，直接服务于削减人数以达成胜利条件，对齐阵营目标。"]}}, "HR总监|skill|": {"role": "HR总监", "event_type": "skill", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "信息利用": {"mean": 0.0, "std": 0.0, "median": 0.0, "ci95": [0.0, 0.0], "sample_count": 1}, "言行一致性": {"mean": 50.0, "std": 0.0, "median": 50.0, "ci95": [50.0, 50.0], "sample_count": 1}, "博弈深度": {"mean": 0.0, "std": 0.0, "median": 0.0, "ci95": [0.0, 0.0], "sample_count": 1}, "信息隐藏": {"mean": 80.0, "std": 0.0, "median": 80.0, "ci95": [80.0, 80.0], "sample_count": 1}, "背调效率": {"mean": 0.0, "std": 0.0, "median": 0.0, "ci95": [0.0, 0.0], "sample_count": 1}, "跳身份时机": {"mean": 30.0, "std": 0.0, "median": 30.0, "ci95": [30.0, 30.0], "sample_count": 1}, "结果对齐度": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}}, "strategy_distribution": {}, "common_mistakes": ["逻辑矛盾"], "dimension_reasons_sample": {"推理质量": ["推理链完全断裂：HR总监查验自己得出的'好人'结果在逻辑上是必然的，不可能得出任何新信息。决策理由'我想先确认自己是不是好人'暴露了玩家对角色技能的根本误解，未体现任何多层博弈思维。"], "信息利用": ["首轮无任何公共信息，但查验自己无法利用后续出现的任何分布、投票或发言线索，完全未考虑信息积累价值。"], "言行一致性": ["此阶段仅有夜间行动，无公开发言或投票可对比，暂无法判断言行是否矛盾。若后续发言据此宣称'我是好人'则属无效背书，可能误导好人阵营。"], "博弈深度": ["纯L0反应层：仅关注'确认自己身份'这一不存在的需求，未进入L1推理（查验他人以建立信息网络），更未考虑L2反逻辑（查验自己可能暴露HR身份或浪费机会给间谍）。"], "信息隐藏": ["查验自己的结果不会暴露任何自身身份信息，客观上避免了技能目标泄露。但这并非策略选择，而是无知带来的偶然安全。"], "背调效率": ["严重违背'查验优先级'原则：已明知自己身份的情况下重复查验，信息增量为零。错失了查验争议焦点或沉默玩家的宝贵机会。"], "跳身份时机": ["未涉及跳身份决策，但这一轮查验浪费会推迟有效信息提供时机，间接影响后续跳身份的可信度和时机选择。"], "结果对齐度": ["最终间谍阵营获胜，好人阵营失败。此决策直接浪费了HR总监唯一且高效的信息获取手段，显著削弱了好人阵营在首轮建立信息优势的可能，严重背离阵营目标。"]}}, "CEO|skill|": {"role": "CEO", "event_type": "skill", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "信息利用": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "言行一致性": {"mean": 50.0, "std": 0.0, "median": 50.0, "ci95": [50.0, 50.0], "sample_count": 1}, "博弈深度": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "信息隐藏": {"mean": 40.0, "std": 0.0, "median": 40.0, "ci95": [40.0, 40.0], "sample_count": 1}, "留人策略": {"mean": 25.0, "std": 0.0, "median": 25.0, "ci95": [25.0, 25.0], "sample_count": 1}, "辞退策略": {"mean": 3.0, "std": 0.0, "median": 3.0, "ci95": [3.0, 3.0], "sample_count": 1}, "结果对齐度": {"mean": 3.0, "std": 0.0, "median": 3.0, "ci95": [3.0, 3.0], "sample_count": 1}}, "strategy_distribution": {}, "common_mistakes": ["时机错误/信息遗漏"], "dimension_reasons_sample": {"推理质量": ["决策理由仅为“感觉他话多”，没有任何可验证的逻辑链条或游戏内证据，属于随机盲毒，毫无推理可言。"], "信息利用": ["首夜无背调、无投票、无死亡信息，客观上可参考信息为零。CEO未利用任何游戏机制（如发言、投票模式）做推断，也未认识到信息匮乏时应保留技能，信息利用极差。"], "言行一致性": ["本局还未产生发言与投票，无明显言行矛盾。但CEO在完全无信息时使用关键技能，与其作为神职应谨慎决策的合理行为预期不符。"], "博弈深度": ["决策仅停留在L0反应层，凭感觉盲毒，未考虑目标可能是好人、未考虑自刀骗银水可能性、未考虑毒药在后期找狼的价值，无任何博弈思考。"], "信息隐藏": ["使用辞退信会暴露CEO存在，但首夜亮神可接受。问题在于无信息盲毒不仅暴露身份，还浪费了隐藏身份可能带来的战术优势，释放了错误信息。"], "留人策略": ["未使用留人offer（解药），保留了救人能力，这点尚可。但夜间同时使用毒药意味着放弃了解药在首夜救人的机会，且毒药乱用可能直接导致好人减员，整体留人策略被毒药决策严重拖累。"], "辞退策略": ["辞退信目标是5号普通员工（好人），仅凭“话多”这种主观感觉，完全不构成证据。首夜6人中盲毒到好人的概率高达83%，极度缺乏验证，属于灾难性误伤。"], "结果对齐度": ["毒杀5号直接减少了公司阵营人数，为潜伏阵营创造了人数优势，实际帮助了间谍获胜，与公司阵营目标完全背离。"]}}, "法务总监|skill|": {"role": "法务总监", "event_type": "skill", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "信息利用": {"mean": 2.0, "std": 0.0, "median": 2.0, "ci95": [2.0, 2.0], "sample_count": 1}, "言行一致性": {"mean": 50.0, "std": 0.0, "median": 50.0, "ci95": [50.0, 50.0], "sample_count": 1}, "博弈深度": {"mean": 3.0, "std": 0.0, "median": 3.0, "ci95": [3.0, 3.0], "sample_count": 1}, "信息隐藏": {"mean": 10.0, "std": 0.0, "median": 10.0, "ci95": [10.0, 10.0], "sample_count": 1}, "诉讼策略": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "结果对齐度": {"mean": 0.0, "std": 0.0, "median": 0.0, "ci95": [0.0, 0.0], "sample_count": 1}}, "strategy_distribution": {}, "common_mistakes": ["时机错误"], "dimension_reasons_sample": {"推理质量": ["完全无推理，仅凭“盲狙一下”作为开枪理由，未引用任何发言、投票或背调信息，未展示任何逻辑链，更无多层博弈思维"], "信息利用": ["第1轮早期阶段虽信息极少，但至少可依据发言活跃度、过往行为模糊判断，此处完全未利用任何已知信息，属于信息完全浪费"], "言行一致性": ["未发生发言与投票矛盾，但“盲狙”这一决策本身与法务总监应保留技能威慑的理性身份定位相悖，内在逻辑不一致"], "博弈深度": ["停留在L0反应层面，仅凭随意感觉开枪，未考虑间谍可能悍跳、盘反逻辑等，完全没有博弈层次"], "信息隐藏": ["法务总监开枪必然暴露身份，第1轮就暴露导致间谍可提前规划屠神路线，且盲带好人后身份全明，信息释放完全失控"], "诉讼策略": ["在无任何证据、无嫌疑人时盲目开枪，未利用一换一威慑，目标选择完全随机，带走了好人，属于严重策略失误"], "结果对齐度": ["带走普通员工直接导致好人减员，帮助间谍阵营建立人数优势，完全背离公司阵营获胜目标"]}}, "间谍|speech|": {"role": "间谍", "event_type": "speech", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 18.0, "std": 0.0, "median": 18.0, "ci95": [18.0, 18.0], "sample_count": 1}, "信息利用": {"mean": 10.0, "std": 0.0, "median": 10.0, "ci95": [10.0, 10.0], "sample_count": 1}, "言行一致性": {"mean": 88.0, "std": 0.0, "median": 88.0, "ci95": [88.0, 88.0], "sample_count": 1}, "博弈深度": {"mean": 25.0, "std": 0.0, "median": 25.0, "ci95": [25.0, 25.0], "sample_count": 1}, "信息隐藏": {"mean": 96.0, "std": 0.0, "median": 96.0, "ci95": [96.0, 96.0], "sample_count": 1}, "团队协作": {"mean": 50.0, "std": 0.0, "median": 50.0, "ci95": [50.0, 50.0], "sample_count": 1}, "伪装质量": {"mean": 82.0, "std": 0.0, "median": 82.0, "ci95": [82.0, 82.0], "sample_count": 1}, "结果对齐度": {"mean": 92.0, "std": 0.0, "median": 92.0, "ci95": [92.0, 92.0], "sample_count": 1}}, "strategy_distribution": {"深潜": 1}, "common_mistakes": [], "dimension_reasons_sample": {"推理质量": ["发言内容'局势不明朗，观察观察'没有构建任何推理链条，未引用任何具体线索（如首轮无信息时的常见应对逻辑），基本属于无实质内容的表达"], "信息利用": ["游戏刚开局确实无死亡、无查验、无投票等硬信息，但作为间谍可尝试利用对好人心理的预判制造话题；此处完全放弃利用任何可能的信息，连模糊的导向都没有"], "言行一致性": ["发言主张'先观察，没什么好说的'与实际行为（潜水、不主动引导）高度一致，没有自相矛盾，符合低调潜伏的目标"], "博弈深度": ["停留在L1层次：装作信息不足的普通员工。未展现L2反逻辑意识（如好人可能因'故意沉默'而起疑，间谍可能利用第一轮发言建立浅层好人面），博弈层次较浅"], "信息隐藏": ["几乎没有透露任何身份线索、队友关系或夜间意图，信息释放为零，极大降低了首轮被锁定的概率"], "团队协作": ["发言未涉及队友配合、未暗示分工，与队友间无可见协调，但未造成负面影响，属于中性"], "伪装质量": ["成功扮演了无信息、保守观察的普通员工形象，语气自然不突兀，在早期阶段能有效融入人群，但内容过于苍白可能在后续被追问时形成破绽"], "结果对齐度": ["该发言帮助1号以最小代价安全度过首轮，为后续潜伏布局保留了完整信息优势，最终间谍阵营获胜，该决策对潜伏阵营胜利起到了正向支撑"]}}, "HR总监|speech|": {"role": "HR总监", "event_type": "speech", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 10.0, "std": 0.0, "median": 10.0, "ci95": [10.0, 10.0], "sample_count": 1}, "信息利用": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "言行一致性": {"mean": 50.0, "std": 0.0, "median": 50.0, "ci95": [50.0, 50.0], "sample_count": 1}, "博弈深度": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "信息隐藏": {"mean": 0.0, "std": 0.0, "median": 0.0, "ci95": [0.0, 0.0], "sample_count": 1}, "跳身份时机": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "结果对齐度": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}}, "strategy_distribution": {}, "common_mistakes": ["暴露身份"], "dimension_reasons_sample": {"推理质量": ["发言毫无推理链，仅声称查验自己并确认自己是好人，这在狼人杀中是经典逻辑漏洞——预言家查验自己既无意义又浪费技能，无法给出可验证的证据，整个推理基础不成立。"], "信息利用": ["作为HR总监，他拥有最关键的夜间查验信息，但完全未向好人阵营透露任何真实背调结果，反而用虚假的“自验”浪费了第1天跳身份的信息窗口，导致好人信息赤字加剧。"], "言行一致性": ["他的发言主张“自己是HR总监”与真实身份一致，但“查验自己”这一行为与真HR总监应有的寻求真相的职责严重矛盾，在诚实性和专业性上自损可信度，后续言行极易被利用。"], "博弈深度": ["决策完全停留在L0反应层——想到什么说什么，未考虑间谍可能悍跳HR总监抢夺话语权，也未预判好人因这个荒谬发言会产生怎样怀疑。未体现任何多层反逻辑思维。"], "信息隐藏": ["在无任何外压的情况下，第1轮白天就自爆HR总监身份，彻底放弃了隐藏关键神的战略优势；更恶劣的是，他浪费了隐蔽传递查验信息的机会，将好人阵营的指挥棒自愿交给了混乱。"], "跳身份时机": ["第1轮白天并非必须跳身份的时机（无人死亡、无查杀压力），他既跳了，却又未给出有效查验结果，使得本次跳身份变成了纯粹的自我暴露和污名化，时机和内容双重失败。"], "结果对齐度": ["此发言直接导致好人核心神牌丧失公信力，极大提高了间谍悍跳/煽动票走真HR总监的成功率，从结果看间谍阵营获胜与此混乱开端高度相关，严重阻碍了公司阵营的目标。"]}}, "CEO|speech|": {"role": "CEO", "event_type": "speech", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 25.0, "std": 0.0, "median": 25.0, "ci95": [25.0, 25.0], "sample_count": 1}, "信息利用": {"mean": 20.0, "std": 0.0, "median": 20.0, "ci95": [20.0, 20.0], "sample_count": 1}, "言行一致性": {"mean": 60.0, "std": 0.0, "median": 60.0, "ci95": [60.0, 60.0], "sample_count": 1}, "博弈深度": {"mean": 30.0, "std": 0.0, "median": 30.0, "ci95": [30.0, 30.0], "sample_count": 1}, "信息隐藏": {"mean": 55.0, "std": 0.0, "median": 55.0, "ci95": [55.0, 55.0], "sample_count": 1}, "结果对齐度": {"mean": 20.0, "std": 0.0, "median": 20.0, "ci95": [20.0, 20.0], "sample_count": 1}}, "strategy_distribution": {"隐藏身份": 1}, "common_mistakes": ["信息过度隐藏"], "dimension_reasons_sample": {"推理质量": ["发言没有构建任何可验证的推理链，仅用“情况比较复杂”和“做了该做的事”模糊带过，缺乏对夜间行动、玩家行为或票型的引用，也未展现对自刀骗银水等反逻辑的思考"], "信息利用": ["作为唯一拥有夜间行动信息的角色之一，完全未利用CEO留人offer/辞退信的反馈来提供任何可讨论的线索，错过了第一轮共享银水或死亡信息的最佳时机，使局面停留在零信息状态"], "言行一致性": ["发言建议“先投沉默的人”与自身模糊发言构成了表述上的自洽，但尚未与后续投票行为对比，当前不矛盾但也不提供一致性验证"], "博弈深度": ["体现了L1隐藏身份思维（避免暴露CEO），但未考虑如何隐蔽地传递关键信息以引导好人，也未对间谍可能伪造银水等进行预防，整体停留在浅层自保层面"], "信息隐藏": ["未直接暴露CEO身份或银水对象，但“情况比较复杂”这种带有明确行动暗示的表述，容易被间谍捕捉并推断为CEO，从而增加被夜间击杀的风险，隐藏技巧略显生硬"], "结果对齐度": ["该决策未提供任何有效信息给同伴，导致第一轮讨论陷入无方向状态，间接帮助潜伏阵营隐藏身份，最终我方阵营落败，该发言明显偏离了协助团队的目标"]}}, "法务总监|speech|": {"role": "法务总监", "event_type": "speech", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 8.0, "std": 0.0, "median": 8.0, "ci95": [8.0, 8.0], "sample_count": 1}, "信息利用": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "言行一致性": {"mean": 60.0, "std": 0.0, "median": 60.0, "ci95": [60.0, 60.0], "sample_count": 1}, "博弈深度": {"mean": 10.0, "std": 0.0, "median": 10.0, "ci95": [10.0, 10.0], "sample_count": 1}, "信息隐藏": {"mean": 85.0, "std": 0.0, "median": 85.0, "ci95": [85.0, 85.0], "sample_count": 1}, "结果对齐度": {"mean": 20.0, "std": 0.0, "median": 20.0, "ci95": [20.0, 20.0], "sample_count": 1}}, "strategy_distribution": {}, "common_mistakes": ["信息错误"], "dimension_reasons_sample": {"推理质量": ["发言几乎无推理链：声称'5号6号都走了'与当前存活状态矛盾（首轮无人死亡），属于明显事实错误。仅凭'一直装傻'这一主观印象指认1号，未引用任何具体行为、投票或发言细节，无法验证。未体现多层博弈思维。"], "信息利用": ["完全未利用任何已知信息。当前轮次无死亡、无背调结果、无投票分布，但决策者凭空制造了'5号6号都走了'的虚假前提，严重脱离实际游戏状态，错失观察和利用玩家首轮初始发言的机会。"], "言行一致性": ["发言明确表达对1号的怀疑，若后续投票投1号则言行一致。但目前仅为口头表态，未出现矛盾。由于处于早期，无法判定后续行动，故给中等分。"], "博弈深度": ["停留在L0反应层——基于直观感受（装傻）作出判断，没有任何推理或诱导策略。既未试图观察1号的反应来获取信息，也未考虑自己发言可能被坏人利用。缺乏最基本的博弈意识。"], "信息隐藏": ["发言未暴露自身法务总监身份，也未泄露任何关键信息。仅提出一个对1号的怀疑，不会过早锁定自己的角色。信息释放控制尚可。"], "结果对齐度": ["作为好人阵营，发言建立在错误事实上且无逻辑支撑，容易误导其他好人、制造混乱，消耗好人方注意力。虽然恰巧怀疑到真间谍（1号），但低质量指控反而可能为间谍提供反打机会，对好人胜利无实质性帮助，后续好人失败亦印证了低效发言的负面倾向。"]}}, "间谍|vote|": {"role": "间谍", "event_type": "vote", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 70.0, "std": 0.0, "median": 70.0, "ci95": [70.0, 70.0], "sample_count": 1}, "信息利用": {"mean": 75.0, "std": 0.0, "median": 75.0, "ci95": [75.0, 75.0], "sample_count": 1}, "言行一致性": {"mean": 90.0, "std": 0.0, "median": 90.0, "ci95": [90.0, 90.0], "sample_count": 1}, "博弈深度": {"mean": 68.0, "std": 0.0, "median": 68.0, "ci95": [68.0, 68.0], "sample_count": 1}, "信息隐藏": {"mean": 50.0, "std": 0.0, "median": 50.0, "ci95": [50.0, 50.0], "sample_count": 1}, "投票策略": {"mean": 82.0, "std": 0.0, "median": 82.0, "ci95": [82.0, 82.0], "sample_count": 1}, "结果对齐度": {"mean": 85.0, "std": 0.0, "median": 85.0, "ci95": [85.0, 85.0], "sample_count": 1}}, "strategy_distribution": {"冲锋": 1}, "common_mistakes": [], "dimension_reasons_sample": {"推理质量": ["以'HR总监背调自己太可疑'为由投票，逻辑简单但符合常识——真HR总监浪费查验机会确实反常，能说服部分好人。但推理链单一，未结合其他玩家行为或轮次分析，缺乏多层博弈思考。"], "信息利用": ["利用了2号声称的背调行为这一公开信息，攻击点具体且可验证。但未引用其他公开信息（如发言顺序、投票倾向）来支撑怀疑，信息利用较单薄。"], "言行一致性": ["投票目标与发言质疑完全一致，没有自相矛盾，怀疑等级6表明了较强攻击意图，言行统一度高。"], "博弈深度": ["从上帝视角看，1号攻击真HR总监属于冲锋陷阵；从玩家视角，疑似好人质疑浪费查验的HR总监，属于L1推理。未明显体现L2反逻辑（如故意打神做身份）或更深层操纵，但作为首轮试探，深度中等。"], "信息隐藏": ["直接攻击跳身份的神职，容易引起HR总监的警觉和查验，暴露自身是狼的风险较高。虽然未暴露队友（可能无队友），但自保方面信息隐藏不足。"], "投票策略": ["投票真HR总监符合间谍阵营削弱好人神职的目标；在首轮制造混乱，分散对潜伏阵营的关注，战术上合理。即使未成功票出，也能为后续抗推铺垫。"], "结果对齐度": ["最终间谍阵营获胜，这一投票行为协同了阵营胜利目标，攻击关键神职的决策对胜利有正向贡献。"]}}, "HR总监|vote|": {"role": "HR总监", "event_type": "vote", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 10.0, "std": 0.0, "median": 10.0, "ci95": [10.0, 10.0], "sample_count": 1}, "信息利用": {"mean": 15.0, "std": 0.0, "median": 15.0, "ci95": [15.0, 15.0], "sample_count": 1}, "言行一致性": {"mean": 65.0, "std": 0.0, "median": 65.0, "ci95": [65.0, 65.0], "sample_count": 1}, "博弈深度": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}, "信息隐藏": {"mean": 82.0, "std": 0.0, "median": 82.0, "ci95": [82.0, 82.0], "sample_count": 1}, "结果对齐度": {"mean": 20.0, "std": 0.0, "median": 20.0, "ci95": [20.0, 20.0], "sample_count": 1}}, "strategy_distribution": {}, "common_mistakes": ["信息遗漏"], "dimension_reasons_sample": {"推理质量": ["投票理由为'没有证据，感觉像间谍'，完全未构建推理链，未引用任何发言、行为或投票模式，逻辑性极弱，属于L0级直觉反应，无多层博弈思维。"], "信息利用": ["决策者已知仅有公开信息，但作为HR总监，第0夜应有查验结果（除非放弃行动），未将自身技能信息纳入决策是重大信息遗漏；公开信息如初始发言状态亦未引用，信息利用率极低。"], "言行一致性": ["发言主张'感觉像间谍'与投票行为3号一致，未自相矛盾，但好人身份投真好人形成更深层的内在矛盾，此处仅评估表面言行一致，尚可。"], "博弈深度": ["决策停留在L0直觉层面，未体现任何L1推理（如分析发言动机）或L2反逻辑（如考虑间谍可能伪装无辜），博弈意识近乎空白，严重不符合职场狼人杀策略要求。"], "信息隐藏": ["未暴露HR总监身份，未泄露查验信息，未保护或攻击特定队友/目标时形成信息关联，模糊发言未提供可追踪的线索，首轮隐藏身份策略执行到位。"], "结果对齐度": ["投票目标是己方真CEO，从上帝视角看直接指向好人核心，助推内部互斗；最终间谍阵营获胜，该决策对好人阵营造成负面影响，严重偏离阵营目标。"]}}, "CEO|vote|": {"role": "CEO", "event_type": "vote", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 25.0, "std": 0.0, "median": 25.0, "ci95": [25.0, 25.0], "sample_count": 1}, "信息利用": {"mean": 15.0, "std": 0.0, "median": 15.0, "ci95": [15.0, 15.0], "sample_count": 1}, "言行一致性": {"mean": 88.0, "std": 0.0, "median": 88.0, "ci95": [88.0, 88.0], "sample_count": 1}, "博弈深度": {"mean": 20.0, "std": 0.0, "median": 20.0, "ci95": [20.0, 20.0], "sample_count": 1}, "信息隐藏": {"mean": 80.0, "std": 0.0, "median": 80.0, "ci95": [80.0, 80.0], "sample_count": 1}, "结果对齐度": {"mean": 5.0, "std": 0.0, "median": 5.0, "ci95": [5.0, 5.0], "sample_count": 1}}, "strategy_distribution": {}, "common_mistakes": ["信息遗漏"], "dimension_reasons_sample": {"推理质量": ["推理链极短且脆弱：仅凭'背调自己浪费信息'就判定2号为狼，忽视了真HR总监在首夜没有明确目标时可能背调自己以求自证清白，或出于保守策略查验自身的可能性。没有结合其他发言、票型或死亡信息交叉验证，也未体现多层博弈思维。"], "信息利用": ["仅利用了2号声称的背调行为这一孤立信息，完全未利用任何投票分布（首轮尚未形成），也无犯罪现场（无人死亡）信息可交叉验证。遗漏了6人局首轮投票容错率极低的关键约束，未能利用信息匮乏本身来推断盲目出票的风险。"], "言行一致性": ["发言理由与投票行为高度一致：声称背调自己对公司无贡献，随之投出这一票。作为CEO隐藏身份期间，言行一致性较好，没有自我矛盾。"], "博弈深度": ["停留在L1表层推理：行为异常→有罪。未达到L2反逻辑层面，没有考虑'真HR总监可能故作不合理以观望反应'或'悍跳狼也可能伪装高价值查验'，更未触及L3以上对自身出票后果的推演（如一旦投错则神职暴露加速失败）。"], "信息隐藏": ["作为CEO，投票时未暴露自身持有留人offer和辞退信的身份，也未泄露夜间操作信息。仅以普通员工视角质疑2号，信息隐藏节奏控制良好。"], "结果对齐度": ["从上帝视角看，此票将真HR总监推入危险境地，直接导致好人核心神职被抗推出局，严重损害公司阵营获胜条件，为最终间谍阵营胜利铺平道路。"]}}, "法务总监|vote|": {"role": "法务总监", "event_type": "vote", "game_stage": null, "sample_count": 1, "dimension_scores": {"推理质量": {"mean": 58.0, "std": 0.0, "median": 58.0, "ci95": [58.0, 58.0], "sample_count": 1}, "信息利用": {"mean": 62.0, "std": 0.0, "median": 62.0, "ci95": [62.0, 62.0], "sample_count": 1}, "言行一致性": {"mean": 92.0, "std": 0.0, "median": 92.0, "ci95": [92.0, 92.0], "sample_count": 1}, "博弈深度": {"mean": 48.0, "std": 0.0, "median": 48.0, "ci95": [48.0, 48.0], "sample_count": 1}, "信息隐藏": {"mean": 90.0, "std": 0.0, "median": 90.0, "ci95": [90.0, 90.0], "sample_count": 1}, "结果对齐度": {"mean": 88.0, "std": 0.0, "median": 88.0, "ci95": [88.0, 88.0], "sample_count": 1}}, "strategy_distribution": {}, "common_mistakes": [], "dimension_reasons_sample": {"推理质量": ["第一轮信息极少，仅凭'全程装傻划水'的行为观察投票，推理链较为单薄，未结合具体发言细节或互动关系，也未体现对反逻辑（狼人可能故意低调或好人可能新手犹豫）的考量，但作为首轮启动性怀疑尚可接受。"], "信息利用": ["能利用的唯一公开信息为发言表现，抓住了1号划水这一可观测行为，未遗漏明显线索，但亦无深度交叉分析（如投票前有无其他玩家的异动），整体信息利用度因信息量匮乏而受限。"], "言行一致性": ["发言中明确表达了对1号的怀疑，投票行为与之完全一致，且怀疑等级7的量化与指控语气匹配，无任何自相矛盾。"], "博弈深度": ["决策停留在L1推理层——'行为异常=可能是狼'，未进入反逻辑层（如考虑深水狼故意潜水、好人恰好不在状态等），更未从身份隐藏角度设计跳身份节奏，首轮可理解但深度不足。"], "信息隐藏": ["仅以普通员工作风怀疑1号，未泄露法务总监身份，亦未提及保护或技能意图，完全符合神职首轮隐身的正确节奏。"], "结果对齐度": ["投票目标恰为商业间谍，直接指向潜伏阵营，无论是否巧合，该决策本身有利于好人阵营缩小怀疑圈，与法务总监的阵营目标高度对齐。"]}}}}, "personas": {"1号": "铁头哥", "2号": "卷王", "3号": "PUA总裁", "4号": "暴躁哥", "5号": "老油条", "6号": "小透明"}, "models": {"1号": "qwen-max", "2号": "qwen-max", "3号": "qwen-max", "4号": "qwen-max", "5号": "qwen-max", "6号": "qwen-max"}, "source_file": "exports\\demo_bad_case.jsonl"}</script>
+<script>
+let R=null;
+const TRAD2WORK={"狼人":"间谍","预言家":"HR总监","女巫":"CEO","猎人":"法务总监","守护者":"安保主管","村民":"普通员工"};
+const WORK2TRAD={"间谍":"狼人","HR总监":"预言家","CEO":"女巫","法务总监":"猎人","安保主管":"守护者","普通员工":"村民"};
+const DEPTH=[{k:"L0",n:"反应层",lo:0,hi:20},{k:"L1",n:"推理层",lo:21,hi:40},{k:"L2",n:"反逻辑层",lo:41,hi:60},{k:"L3",n:"反反逻辑层",lo:61,hi:80},{k:"L4+",n:"高阶博弈层",lo:81,hi:100}];
+const DIM_CN={"speech":"发言","vote":"投票","skill":"技能","other":"其他"};
+function fmt(v,d=2){return v==null?"-":Number(v).toFixed(d)}
+function roleCls(r){return r==="狼人"?"role-wolf":"role-good"}
+function roleDisplay(r,both){if(both){const w=TRAD2WORK[r];return w?r+"("+w+")":r}return r}
+function hasLLM(){return R.llm_judge_scores&&!R.llm_judge_scores.error&&R.llm_judge_scores.length>0}
+function depthLvl(s){for(const d of DEPTH)if(s>=d.lo&&s<=d.hi)return d;return DEPTH[0]}
+function scoreColor(s){return s>=70?"var(--success)":s>=50?"var(--warn)":"var(--danger)"}
+function barFill(pct,c){return `<div class="bar-fill" style="width:${Math.max(2,pct)}%;background:${c}">${Math.round(pct)}%</div>`}
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function llmForPlayer(p){return(R.llm_judge_scores||[]).filter(x=>x.player===p)}
+function llmForDecision(p,r){return(R.llm_judge_scores||[]).find(x=>x.player===p&&x.round===r)}
+function playerTags(p){const ls=llmForPlayer(p);const m={};ls.forEach(x=>{const s=x.decision_tags&&x.decision_tags.strategy_used;if(s){m[s]=(m[s]||0)+1}});return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(e=>e[0]+"×"+e[1]).join(", ")}
+
+function renderSummary(){
+  const s=R.summary||{},ds=R.dimension_scores||{};
+  const llmCount=(R.llm_judge_scores||[]).length;
+  let h=`<div class="cards">`;
+  h+=`<div class="card"><div class="label">综合得分</div><div class="value" style="color:${scoreColor(s.overall_score)}">${fmt(s.overall_score)}</div></div>`;
+  h+=`<div class="card"><div class="label">决策数</div><div class="value">${s.decision_count||0}</div></div>`;
+  h+=`<div class="card"><div class="label">高危失误</div><div class="value" style="color:var(--danger)">${s.high_severity_mistakes||0}</div></div>`;
+  h+=`<div class="card"><div class="label">中危失误</div><div class="value" style="color:var(--warn)">${s.medium_severity_mistakes||0}</div></div>`;
+  const cov=s.coverage||{};
+  h+=`<div class="card"><div class="label">投票事件</div><div class="value">${cov.vote||0}</div></div>`;
+  h+=`<div class="card"><div class="label">技能事件</div><div class="value">${cov.skill||0}</div></div>`;
+  h+=`<div class="card"><div class="label">发言事件</div><div class="value">${cov.speech||0}</div></div>`;
+  if(hasLLM()){
+    const avgConf=llmCount?R.llm_judge_scores.reduce((a,x)=>a+(x.llm_confidence||0),0)/llmCount:0;
+    h+=`<div class="card"><div class="label">LLM评测</div><div class="value" style="color:var(--success)">${llmCount}条</div></div>`;
+    h+=`<div class="card"><div class="label">LLM置信度</div><div class="value" style="color:var(--success)">${fmt(avgConf*100,0)}%</div></div>`;
+  }
+  h+=`</div>`;
+  document.getElementById("summary-section").innerHTML=h;
+  document.getElementById("header-meta").textContent=`生成时间: ${R.generated_at||""} | 来源: ${R.source_file||""}`;
+}
+
+function renderLeaderboard(){
+  const lb=R.leaderboard||[];
+  const llm=hasLLM();
+  const personas=R.personas||{};const models=R.models||{};
+  const hasMeta=Object.keys(personas).length>0||Object.keys(models).length>0;
+  let h=`<thead><tr><th>#</th><th>玩家</th><th>角色</th>`;
+  if(hasMeta)h+=`<th>人设</th><th>模型</th>`;
+  h+=`<th>决策</th><th>发言</th><th>投票</th><th>技能</th><th>综合</th>`;
+  if(llm)h+=`<th>融合分</th><th>策略标签</th>`;
+  h+=`<th>高危</th></tr></thead><tbody>`;
+  lb.forEach((e,i)=>{
+    const rc=roleCls(e.role);
+    h+=`<tr><td>${i+1}</td><td>${esc(e.player)}</td><td class="${rc}">${roleDisplay(e.role)}</td>`;
+    if(hasMeta)h+=`<td>${esc(personas[e.player]||"-")}</td><td style="font-size:.8rem">${esc(models[e.player]||"-")}</td>`;
+    h+=`<td>${e.decision_count||0}</td>`;
+    h+=`<td>${fmt(e.speech_score,1)}</td><td>${fmt(e.vote_score,1)}</td><td>${fmt(e.skill_score,1)}</td>`;
+    h+=`<td style="font-weight:700;color:${scoreColor(e.overall_score)}">${fmt(e.overall_score)}</td>`;
+    if(llm){
+      const ls=llmForPlayer(e.player);
+      const fused=ls.length?ls.reduce((a,x)=>a+(x.fused_score||0),0)/ls.length:e.overall_score;
+      h+=`<td style="color:${scoreColor(fused)}">${fmt(fused)}</td>`;
+      h+=`<td style="font-size:.8rem">${playerTags(e.player)||"-"}</td>`;
+    }
+    h+=`<td>${e.critical_mistakes||0}</td></tr>`;
+  });
+  h+=`</tbody>`;
+  document.getElementById("leaderboard-table").innerHTML=h;
+}
+
+function renderDimensionComparison(){
+  const ds=R.dimension_scores||{};
+  const el=document.getElementById("dimension-section");
+  let h=`<div class="chart-box"><h3>规则引擎评分</h3><div class="bar-chart">`;
+  Object.entries(ds).forEach(([k,v])=>{
+    h+=`<div class="bar-row"><div class="bar-label">${DIM_CN[k]||k}</div><div class="bar-container">${barFill(v,"linear-gradient(90deg,#3a7bd5,#00d2ff)")}</div></div>`;
+  });
+  h+=`</div></div>`;
+  if(hasLLM()){
+    const agg=R.llm_aggregate||{};const cu=agg.comparison_units||{};
+    const dimAvg={};const dimCnt={};
+    Object.values(cu).forEach(u=>{
+      Object.entries(u.dimension_scores||{}).forEach(([dn,ds])=>{
+        if(!dimAvg[dn]){dimAvg[dn]=0;dimCnt[dn]=0}
+        dimAvg[dn]+=ds.mean;dimCnt[dn]++;
+      });
+    });
+    Object.keys(dimAvg).forEach(k=>{dimAvg[k]/=dimCnt[k]});
+    h+=`<div class="chart-box"><h3>LLM维度评分（均值）</h3><div class="bar-chart">`;
+    const sorted=Object.entries(dimAvg).sort((a,b)=>b[1]-a[1]);
+    sorted.forEach(([k,v])=>{
+      h+=`<div class="bar-row"><div class="bar-label">${k}</div><div class="bar-container">${barFill(v,"linear-gradient(90deg,#ffd700,#ff8c00)")}</div></div>`;
+    });
+    h+=`</div></div>`;
+    h+=`<div class="chart-box"><h3>规则 vs LLM 对比</h3><div class="bar-chart">`;
+    const ruleMap={"推理质量":"other","信息利用":"other","言行一致性":"speech","博弈深度":"other","信息隐藏":"other"};
+    sorted.forEach(([k,v])=>{
+      const rk=ruleMap[k]||"other";const rv=ds[rk]||0;
+      h+=`<div class="bar-row"><div class="bar-label">${k}</div>`;
+      h+=`<div class="bar-container"><div class="bar-fill" style="width:${Math.max(2,rv)}%;background:linear-gradient(90deg,#3a7bd5,#00d2ff)">${Math.round(rv)}</div>`;
+      h+=`<div class="bar-fill" style="width:${Math.max(2,v)}%;background:linear-gradient(90deg,#ffd700,#ff8c00)">${Math.round(v)}</div></div></div>`;
+    });
+    h+=`</div></div>`;
+  }
+  el.innerHTML=h;
+}
+
+function renderStrategyDistribution(){
+  if(!hasLLM())return;
+  const cu=(R.llm_aggregate||{}).comparison_units||{};
+  const byRole={};
+  Object.values(cu).forEach(u=>{
+    const r=u.role||"?";const sd=u.strategy_distribution||{};
+    if(!byRole[r])byRole[r]={};
+    Object.entries(sd).forEach(([s,c])=>{byRole[r][s]=(byRole[r][s]||0)+c});
+  });
+  let h=`<div class="charts-grid">`;
+  Object.entries(byRole).forEach(([role,strats])=>{
+    const total=Object.values(strats).reduce((a,b)=>a+b,0);
+    h+=`<div class="chart-box"><h3>${roleDisplay(WORK2TRAD[role]||role,true)}</h3><div class="bar-chart">`;
+    Object.entries(strats).sort((a,b)=>b[1]-a[1]).forEach(([s,c])=>{
+      h+=`<div class="bar-row"><div class="bar-label">${esc(s)}</div><div class="bar-container">${barFill(c/total*100,"linear-gradient(90deg,#4ecdc4,#00d2ff)")}<span style="margin-left:6px;font-size:.8rem">${c}次</span></div></div>`;
+    });
+    h+=`</div></div>`;
+  });
+  h+=`</div>`;
+  document.getElementById("strategy-section").innerHTML=h;
+}
+
+function renderGameDepth(){
+  if(!hasLLM())return;
+  const bins={};DEPTH.forEach(d=>bins[d.k]=0);
+  (R.llm_judge_scores||[]).forEach(x=>{
+    const s=(x.llm_scores||{})["博弈深度"];if(s==null)return;
+    bins[depthLvl(s).k]++;
+  });
+  const total=Object.values(bins).reduce((a,b)=>a+b,0)||1;
+  let h=`<div class="bar-chart" style="max-width:600px">`;
+  DEPTH.forEach(d=>{
+    const c=bins[d.k];
+    h+=`<div class="bar-row"><div class="bar-label">${d.k} ${d.n}</div><div class="bar-container">${barFill(c/total*100,"linear-gradient(90deg,#ff6b6b,#ffd700,#4ecdc4,#00d2ff,#a855f7)".split(",").slice(DEPTH.indexOf(d),DEPTH.indexOf(d)+1)[0]||"#00d2ff")}<span style="margin-left:6px;font-size:.8rem">${c}次</span></div></div>`;
+  });
+  h+=`</div>`;
+  const colors=["#ff6b6b","#ffd700","#4ecdc4","#00d2ff","#a855f7"];
+  let h2=`<div class="bar-chart" style="max-width:600px">`;
+  DEPTH.forEach((d,i)=>{
+    const c=bins[d.k];
+    h2+=`<div class="bar-row"><div class="bar-label">${d.k} ${d.n}</div><div class="bar-container">${barFill(c/total*100,colors[i])}<span style="margin-left:6px;font-size:.8rem">${c}次</span></div></div>`;
+  });
+  h2+=`</div>`;
+  document.getElementById("depth-section").innerHTML=h2;
+}
+
+function renderFindings(){
+  const fs=R.findings||[];const top=fs.slice(0,15);
+  let h="";
+  if(!top.length){h=`<p style="color:var(--success)">未发现明显失误</p>`;document.getElementById("findings-section").innerHTML=h;return}
+  top.forEach(f=>{
+    const sc=f.severity==="high"?"finding-high":f.severity==="medium"?"finding-medium":"finding-low";
+    h+=`<div class="finding-card ${sc}">`;
+    h+=`<div class="title"><span class="tag ${f.severity==="high"?"tag-risk-high":f.severity==="medium"?"tag-risk-mid":"tag-risk-low"}">${f.severity}</span> 第${f.round||"-"}轮 ${esc(f.player)}（${roleDisplay(f.role)}）— ${esc(f.title)}</div>`;
+    h+=`<div class="evidence">${esc(f.evidence||"")}</div>`;
+    h+=`<div class="rec">建议: ${esc(f.recommendation||"")}</div>`;
+    if(f.counterfactual)h+=`<div class="cf">反事实: ${esc(f.counterfactual)}</div>`;
+    const llm=llmForDecision(f.player,f.round);
+    if(llm){
+      h+=`<div class="llm-comment">`;
+      if(llm.overall_comment)h+=`<div>LLM点评: ${esc(llm.overall_comment)}</div>`;
+      const dt=llm.decision_tags||{};
+      if(dt.strategy_used)h+=`<span class="tag tag-strategy">${esc(dt.strategy_used)}</span>`;
+      if(dt.mistake_type)h+=`<span class="tag tag-mistake">${esc(dt.mistake_type)}</span>`;
+      if(dt.game_impact)h+=`<span class="tag tag-impact">${esc(dt.game_impact)}</span>`;
+      h+=`</div>`;
+    }
+    h+=`</div>`;
+  });
+  if(fs.length>15)h+=`<div style="color:var(--muted);font-size:.85rem">共${fs.length}条，显示前15条</div>`;
+  document.getElementById("findings-section").innerHTML=h;
+}
+
+function renderPlayerCards(){
+  const lb=R.leaderboard||[];const evts=R.events||[];
+  const personas=R.personas||{};const models=R.models||{};
+  let h="";
+  lb.forEach(e=>{
+    const rc=roleCls(e.role);
+    const pEvts=evts.filter(x=>x.player===e.player).slice(-10);
+    const llm=llmForPlayer(e.player);
+    const persona=personas[e.player]||"";
+    const model=models[e.player]||"";
+    h+=`<div class="player-card">`;
+    h+=`<div class="pheader"><div><div class="pname">${esc(e.player)}</div><div class="${rc}" style="font-size:.85rem">${roleDisplay(e.role)}${persona?" · "+esc(persona):""}</div>`;
+    if(model)h+=`<div style="font-size:.75rem;color:var(--muted)">${esc(model)}</div>`;
+    h+=`</div>`;
+    h+=`<div class="pscore" style="color:${scoreColor(e.overall_score)}">${fmt(e.overall_score)}</div></div>`;
+    [["发言",e.speech_score,"#00d2ff"],["投票",e.vote_score,"#4ecdc4"],["技能",e.skill_score,"#ffd700"]].forEach(([lb2,v,c])=>{
+      h+=`<div class="stat"><span class="k">${lb2}</span><span>${fmt(v,1)}</span></div>`;
+      h+=`<div class="stat-bar"><div class="stat-bar-fill" style="width:${Math.max(1,v)}%;background:${c}"></div></div>`;
+    });
+    if(llm.length){
+      const fused=llm.reduce((a,x)=>a+(x.fused_score||0),0)/llm.length;
+      h+=`<div class="stat" style="margin-top:8px"><span class="k">融合分</span><span style="color:${scoreColor(fused)}">${fmt(fused)}</span></div>`;
+      const tags=playerTags(e.player);
+      if(tags)h+=`<div style="margin-top:4px;font-size:.8rem">${tags}</div>`;
+    }
+    h+=`<div class="event-timeline">`;
+    pEvts.forEach(ev=>{
+      h+=`<div class="ev">第${ev.round||"-"}轮 ${ev.category==="vote"?"投票→"+esc(ev.target||"?"):ev.category==="skill"?esc(ev.action||"技能"):"发言"} <span style="color:${scoreColor(ev.score||0)}">${fmt(ev.score,0)}</span></div>`;
+    });
+    h+=`</div></div>`;
+  });
+  document.getElementById("players-section").innerHTML=h;
+}
+
+function renderLLMAggregate(){
+  if(!hasLLM())return;
+  const cu=(R.llm_aggregate||{}).comparison_units||{};
+  let h="";
+  Object.entries(cu).forEach(([key,u])=>{
+    const parts=key.split("|");const role=u.role||parts[0]||"?";const et=u.event_type||parts[1]||"?";const stage=u.game_stage||parts[2]||"";
+    h+=`<div class="chart-box" style="margin-bottom:16px">`;
+    h+=`<h3>${roleDisplay(WORK2TRAD[role]||role,true)} | ${et}${stage?" | "+stage:""} <span style="color:var(--muted);font-size:.8rem">(${u.sample_count||0}样本)</span></h3>`;
+    h+=`<div class="bar-chart">`;
+    Object.entries(u.dimension_scores||{}).sort((a,b)=>b[1].mean-a[1].mean).forEach(([dn,ds])=>{
+      h+=`<div class="bar-row"><div class="bar-label">${dn}</div><div class="bar-container">${barFill(ds.mean,"linear-gradient(90deg,#4ecdc4,#00d2ff)")}<span style="margin-left:6px;font-size:.78rem;color:var(--muted)">${fmt(ds.mean,1)} ±${fmt(ds.std,1)} [${fmt(ds.ci95[0],1)},${fmt(ds.ci95[1],1)}]</span></div></div>`;
+    });
+    h+=`</div>`;
+    const sd=u.strategy_distribution||{};
+    if(Object.keys(sd).length){
+      h+=`<div style="margin-top:8px;font-size:.85rem">策略: `;
+      Object.entries(sd).sort((a,b)=>b[1]-a[1]).forEach(([s,c])=>{h+=`<span class="tag tag-strategy">${esc(s)}×${c}</span>`});
+      h+=`</div>`;
+    }
+    const cm=u.common_mistakes||[];
+    if(cm.length)h+=`<div style="margin-top:4px;font-size:.82rem;color:var(--danger)">常见失误: ${cm.map(esc).join(", ")}</div>`;
+    h+=`</div>`;
+  });
+  document.getElementById("aggregate-section").innerHTML=h;
+}
+
+function renderDiscrepancies(){
+  if(!hasLLM())return;
+  const items=[];
+  (R.llm_judge_scores||[]).forEach(x=>{
+    (x.score_discrepancies||[]).forEach(d=>{items.push({...d,player:x.player,round:x.round,event_type:x.event_type,comment:x.overall_comment})});
+  });
+  items.sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap));
+  const top=items.slice(0,12);
+  if(!top.length){document.getElementById("discrepancy-section").innerHTML=`<p style="color:var(--muted)">规则引擎与LLM评分无显著差异</p>`;return}
+  let h="";
+  top.forEach(d=>{
+    h+=`<div class="discrepancy-card">`;
+    h+=`<div style="font-weight:700">${esc(d.player)} 第${d.round||"-"}轮 ${d.event_type||""} — <span class="gap">差距 ${fmt(d.gap,1)}</span></div>`;
+    h+=`<div style="margin-top:4px;font-size:.88rem">规则: <span style="color:var(--accent)">${fmt(d.rule)}</span> | LLM: <span style="color:var(--warn)">${fmt(d.llm)}</span></div>`;
+    if(d.comment)h+=`<div style="margin-top:4px;font-size:.82rem;color:var(--muted)">LLM点评: ${esc(d.comment)}</div>`;
+    h+=`</div>`;
+  });
+  document.getElementById("discrepancy-section").innerHTML=h;
+}
+
+function renderCounterfactuals(){
+  const cfs=R.counterfactuals||[];const fs=R.findings||[];
+  if(!cfs.length&&!fs.length){document.getElementById("counterfactual-section").innerHTML=`<p style="color:var(--muted)">暂无反事实数据</p>`;return}
+  let h="";
+  cfs.slice(0,10).forEach((c,i)=>{
+    h+=`<div class="counterfactual-card"><div class="cf-title">推演 #${i+1}</div><div class="cf-body">${esc(c)}</div></div>`;
+  });
+  if(cfs.length>10)h+=`<div style="color:var(--muted);font-size:.85rem">共${cfs.length}条，显示前10条</div>`;
+  document.getElementById("counterfactual-section").innerHTML=h;
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  try{R=JSON.parse(document.getElementById("report-data").textContent)}catch(e){console.error("Failed to parse report data",e);return}
+  if(hasLLM())document.querySelectorAll(".llm-only").forEach(el=>el.style.display="block");
+  renderSummary();renderLeaderboard();renderDimensionComparison();
+  if(hasLLM()){renderStrategyDistribution();renderGameDepth();renderLLMAggregate();renderDiscrepancies()}
+  renderFindings();renderPlayerCards();renderCounterfactuals();
+});
+</script>
+</body>
+</html>
