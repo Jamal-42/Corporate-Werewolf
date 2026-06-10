@@ -156,27 +156,24 @@ python evolution.py stats --group-by faction
 
 ### 6. 前端系统
 
-**主前端（Next.js 实时对局系统）**：
+> **⭐ Next.js 实时对局系统（主入口）**
+>
+> ```bash
+> cd frontend
+> npm install   # 首次安装依赖
+> npm run dev   # http://localhost:3000
+> ```
+>
+> 支持实时对局观战、3D竞技场、SSE事件流、人机混战、TTS/ASR语音、对局回放。
+
+<details>
+<summary>轻量回放（备选，Gradio）</summary>
 
 ```bash
-cd frontend
-npm install   # 首次安装依赖
-npm run dev   # http://localhost:3000
+python web_ui.py          # http://127.0.0.1:7860
+python review_dashboard.py  # http://127.0.0.1:7007
 ```
-
-支持实时对局观战、3D竞技场、SSE事件流、人机混战、TTS/ASR语音、对局回放。
-
-**轻量回放（备选）**：
-
-| 子选项 | 说明 | 地址 |
-|--------|------|------|
-| a) 游戏回放 | Gradio 围桌式动画回放 | http://127.0.0.1:7860 |
-| b) 评测面板 | 评测报告、排行榜 | http://127.0.0.1:7007 |
-
-```bash
-python web_ui.py --host 127.0.0.1 --port 7860
-python review_dashboard.py --host 127.0.0.1 --port 7007
-```
+</details>
 
 ### 7. 环境检查
 
