@@ -154,17 +154,25 @@ python evolution.py history
 python evolution.py stats --group-by faction
 ```
 
-### 6. Web UI
+### 6. 前端系统
+
+**主前端（Next.js 实时对局系统）**：
+
+```bash
+cd frontend
+npm install   # 首次安装依赖
+npm run dev   # http://localhost:3000
+```
+
+支持实时对局观战、3D竞技场、SSE事件流、人机混战、TTS/ASR语音、对局回放。
+
+**轻量回放（备选）**：
 
 | 子选项 | 说明 | 地址 |
 |--------|------|------|
-| a) 游戏回放 | 围桌式动画回放对局过程 | http://127.0.0.1:7860 |
-| b) 评测面板 | 查看评测报告、排行榜、失误复盘 | http://127.0.0.1:7007 |
-| c) 同时启动 | 两个服务各开一个窗口 | 两个地址都可用 |
+| a) 游戏回放 | Gradio 围桌式动画回放 | http://127.0.0.1:7860 |
+| b) 评测面板 | 评测报告、排行榜 | http://127.0.0.1:7007 |
 
-Web UI 启动后保持运行，按 `Ctrl+C` 停止。选"同时启动"会开两个新窗口，关闭窗口即停止。
-
-**等效命令**：
 ```bash
 python web_ui.py --host 127.0.0.1 --port 7860
 python review_dashboard.py --host 127.0.0.1 --port 7007
@@ -195,7 +203,7 @@ python -m pytest tests/test_voting.py -v
 
 ## 工作流示例
 
-### 典型流程：跑局 → 评测 → 回放
+### 典型流程：跑局 → 评测 → 观战
 
 ```
 1. 双击 run.bat
@@ -204,10 +212,9 @@ python -m pytest tests/test_voting.py -v
 4. 选 4 → 评测游戏日志
    - 从列表选择刚生成的 .jsonl 文件
    - 不启用 LLM 评测（回车用默认值）
-5. 回到菜单，选 6a → 打开游戏回放
-   - 浏览器访问 http://127.0.0.1:7860
-6. 回到菜单，选 6b → 打开评测面板
-   - 浏览器访问 http://127.0.0.1:7007
+5. 打开前端观战/回放
+   - cd frontend && npm run dev
+   - 浏览器访问 http://localhost:3000
 ```
 
 ### Skills 进化流程
@@ -345,8 +352,11 @@ python evaluation_cn.py --log exports/game_12p_20260604.jsonl
 # 进化
 python evolution.py evolve --generations 3
 
-# 回放
-python web_ui.py
+# 前端（实时对局 + 回放）
+cd frontend && npm run dev  # http://localhost:3000
+
+# 轻量回放（备选）
+python web_ui.py  # http://127.0.0.1:7860
 
 # 测试
 python -m pytest tests/ -v
